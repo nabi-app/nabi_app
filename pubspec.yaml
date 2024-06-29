@@ -37,6 +37,25 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider: 6.1.2
   go_router: 14.1.3
+  flutter_screenutil: 5.9.1
+  flutter_gen: 5.5.0+1
+  flutter_svg: 2.0.10+1
+  url_launcher: 6.2.6
+  image_picker: 1.1.2
+  flutter_keyboard_visibility: 6.0.0
+  dio: 5.4.3+1
+  retrofit: 4.1.0
+  freezed_annotation: 2.4.1
+  json_annotation: 4.9.0
+  get_it: 7.7.0
+  injectable: 2.4.2
+  permission_handler: 11.3.1
+  device_info_plus: 10.1.0
+  kakao_flutter_sdk_user: 1.9.3
+  fluttertoast: 8.2.6
+  flutter_dotenv: 5.1.0
+  sign_in_with_apple: 6.1.1
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +67,17 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  build_runner: 2.4.10
+  flutter_gen_runner: 5.5.0+1
+  retrofit_generator: 8.1.0
+  freezed: 2.5.2
+  json_serializable: 6.8.0
+  injectable_generator: 2.6.1
+
+flutter_gen:
+  output: lib/ui
+  integrations:
+    flutter_svg: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -59,6 +89,15 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/svg/
+    - .env
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Bold.otf
+        - asset: assets/fonts/Pretendard-Medium.otf
+        - asset: assets/fonts/Pretendard-Regular.otf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
