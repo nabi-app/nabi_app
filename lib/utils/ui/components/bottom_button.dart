@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 class BottomButton extends StatelessWidget {
   final String text;

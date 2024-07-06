@@ -25,8 +25,6 @@ mixin _$UserModel {
   DateTime? get deletedAt => throw _privateConstructorUsedError;
   int get userId => throw _privateConstructorUsedError;
   String? get email => throw _privateConstructorUsedError;
-  String get accessToken => throw _privateConstructorUsedError;
-  String get refreshToken => throw _privateConstructorUsedError;
   String get nickname => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
   bool get marketingConsent => throw _privateConstructorUsedError;
@@ -49,8 +47,6 @@ abstract class $UserModelCopyWith<$Res> {
       DateTime? deletedAt,
       int userId,
       String? email,
-      String accessToken,
-      String refreshToken,
       String nickname,
       String? profileImage,
       bool marketingConsent,
@@ -75,8 +71,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? deletedAt = freezed,
     Object? userId = null,
     Object? email = freezed,
-    Object? accessToken = null,
-    Object? refreshToken = null,
     Object? nickname = null,
     Object? profileImage = freezed,
     Object? marketingConsent = null,
@@ -103,14 +97,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
-      accessToken: null == accessToken
-          ? _value.accessToken
-          : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      refreshToken: null == refreshToken
-          ? _value.refreshToken
-          : refreshToken // ignore: cast_nullable_to_non_nullable
-              as String,
       nickname: null == nickname
           ? _value.nickname
           : nickname // ignore: cast_nullable_to_non_nullable
@@ -145,8 +131,6 @@ abstract class _$$UserModelImplCopyWith<$Res>
       DateTime? deletedAt,
       int userId,
       String? email,
-      String accessToken,
-      String refreshToken,
       String nickname,
       String? profileImage,
       bool marketingConsent,
@@ -169,8 +153,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? deletedAt = freezed,
     Object? userId = null,
     Object? email = freezed,
-    Object? accessToken = null,
-    Object? refreshToken = null,
     Object? nickname = null,
     Object? profileImage = freezed,
     Object? marketingConsent = null,
@@ -197,14 +179,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
-      accessToken: null == accessToken
-          ? _value.accessToken
-          : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      refreshToken: null == refreshToken
-          ? _value.refreshToken
-          : refreshToken // ignore: cast_nullable_to_non_nullable
-              as String,
       nickname: null == nickname
           ? _value.nickname
           : nickname // ignore: cast_nullable_to_non_nullable
@@ -234,8 +208,6 @@ class _$UserModelImpl implements _UserModel {
       this.deletedAt,
       required this.userId,
       this.email,
-      required this.accessToken,
-      required this.refreshToken,
       required this.nickname,
       this.profileImage,
       required this.marketingConsent,
@@ -255,10 +227,6 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String? email;
   @override
-  final String accessToken;
-  @override
-  final String refreshToken;
-  @override
   final String nickname;
   @override
   final String? profileImage;
@@ -269,7 +237,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, userId: $userId, email: $email, accessToken: $accessToken, refreshToken: $refreshToken, nickname: $nickname, profileImage: $profileImage, marketingConsent: $marketingConsent, provider: $provider)';
+    return 'UserModel(createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, userId: $userId, email: $email, nickname: $nickname, profileImage: $profileImage, marketingConsent: $marketingConsent, provider: $provider)';
   }
 
   @override
@@ -285,10 +253,6 @@ class _$UserModelImpl implements _UserModel {
                 other.deletedAt == deletedAt) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.accessToken, accessToken) ||
-                other.accessToken == accessToken) &&
-            (identical(other.refreshToken, refreshToken) ||
-                other.refreshToken == refreshToken) &&
             (identical(other.nickname, nickname) ||
                 other.nickname == nickname) &&
             (identical(other.profileImage, profileImage) ||
@@ -301,19 +265,8 @@ class _$UserModelImpl implements _UserModel {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      createdAt,
-      updatedAt,
-      deletedAt,
-      userId,
-      email,
-      accessToken,
-      refreshToken,
-      nickname,
-      profileImage,
-      marketingConsent,
-      provider);
+  int get hashCode => Object.hash(runtimeType, createdAt, updatedAt, deletedAt,
+      userId, email, nickname, profileImage, marketingConsent, provider);
 
   @JsonKey(ignore: true)
   @override
@@ -336,8 +289,6 @@ abstract class _UserModel implements UserModel {
       final DateTime? deletedAt,
       required final int userId,
       final String? email,
-      required final String accessToken,
-      required final String refreshToken,
       required final String nickname,
       final String? profileImage,
       required final bool marketingConsent,
@@ -356,10 +307,6 @@ abstract class _UserModel implements UserModel {
   int get userId;
   @override
   String? get email;
-  @override
-  String get accessToken;
-  @override
-  String get refreshToken;
   @override
   String get nickname;
   @override

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nabi_app/presentaion/main/home/home_tab.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
+import 'package:nabi_app/presentaion/home/home_page.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 class SignUpCompleteView extends StatelessWidget {
   const SignUpCompleteView({super.key});
@@ -40,7 +40,7 @@ class SignUpCompleteView extends StatelessWidget {
             ),
             SizedBox(height: 130.w,),
             GestureDetector(
-              onTap: () => context.goNamed(HomeTab.name),
+              onTap: () => context.goNamed(HomePage.name),
               child: Container(
                 width: 220.w,
                 height: 52.w,

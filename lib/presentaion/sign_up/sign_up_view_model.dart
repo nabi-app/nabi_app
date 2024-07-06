@@ -1,14 +1,41 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
-import 'package:nabi_app/utils/components/toast_widget.dart';
+import 'package:nabi_app/di/di_setup.dart';
+import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
+import 'package:nabi_app/domain/repository/user_auth_repository.dart';
+import 'package:nabi_app/enum/sign_up_term_type.dart';
+import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
+import 'package:nabi_app/router/router_config.dart';
+import 'package:nabi_app/utils/ui/components/toast_widget.dart';
+import 'package:nabi_app/user/auth_provider.dart';
+import 'package:nabi_app/utils/constants.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 @injectable
 class SignUpViewModel extends ChangeNotifier {
-  final List _terms = [];
+  final UserAuthRepository _repository;
+  final SignUpTransmissionModel _signUpTransmissionModel;
+
+  SignUpViewModel(
+    this._repository,
+    @factoryParam this._signUpTransmissionModel,
+  );
+
+  final Set<SignUpTermType> _terms = {};
+
+  Set<SignUpTermType> get terms => _terms;
+
+  bool get agreedNecessaryTerms => _terms.containsAll({
+        SignUpTermType.olderAge14,
+        SignUpTermType.serviceUsage,
+        SignUpTermType.privacy,
+      });
 
   String _nickname = "";
 
@@ -32,7 +59,13 @@ class SignUpViewModel extends ChangeNotifier {
 
   File? get profileImage => _profileImage;
 
-  void onTermSelected() {
+  void onTermSelected(SignUpTermType term) {
+    if (_terms.contains(term)) {
+      _terms.remove(term);
+    } else {
+      _terms.add(term);
+    }
+
     notifyListeners();
   }
 
@@ -82,7 +115,40 @@ class SignUpViewModel extends ChangeNotifier {
       _profileImage = File(image.path);
       notifyListeners();
     } catch (e) {
-      showToast(message: "이미지를 불러오는데 실패하였습니다.");
+      showToast(message: "이미지를 불러오는데 실패했습니다.");
+    }
+  }
+
+  Future<void> signUp() async {
+    try {
+      final response = await _repository.signUp(
+        email: _signUpTransmissionModel.email,
+        provider: _signUpTransmissionModel.loginType.name,
+        nickname: nickname,
+        marketingConsent: _terms.contains(SignUpTermType.marketing),
+        file: _profileImage,
+      );
+
+      final storage = getIt<FlutterSecureStorage>();
+
+      await Future.wait(
+        [
+          storage.write(
+            key: accessTokenKey,
+            value: response.accessToken,
+          ),
+          storage.write(
+            key: refreshTokenKey,
+            value: response.refreshToken,
+          ),
+        ],
+      );
+
+      rootContext?.read<AuthProvider>().updateUserInfo(response.user);
+
+      rootContext?.goNamed(SignUpCompleteView.name);
+    } catch (e) {
+      showToast(message: "회원가입에 실패했습니다.");
     }
   }
 }

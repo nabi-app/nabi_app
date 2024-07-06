@@ -13,8 +13,6 @@ class UserModel with _$UserModel {
     DateTime? deletedAt,
     required int userId,
     String? email,
-    required String accessToken,
-    required String refreshToken,
     required String nickname,
     String? profileImage,
     required bool marketingConsent,
