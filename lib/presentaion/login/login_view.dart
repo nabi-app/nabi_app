@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
-import 'package:nabi_app/ui/assets.gen.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
+import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatelessWidget {

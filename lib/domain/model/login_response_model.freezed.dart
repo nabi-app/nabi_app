@@ -22,6 +22,8 @@ LoginResponseModel _$LoginResponseModelFromJson(Map<String, dynamic> json) {
 mixin _$LoginResponseModel {
   UserModel? get user => throw _privateConstructorUsedError;
   bool get isCreated => throw _privateConstructorUsedError;
+  String? get accessToken => throw _privateConstructorUsedError;
+  String? get refreshToken => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -35,7 +37,11 @@ abstract class $LoginResponseModelCopyWith<$Res> {
           LoginResponseModel value, $Res Function(LoginResponseModel) then) =
       _$LoginResponseModelCopyWithImpl<$Res, LoginResponseModel>;
   @useResult
-  $Res call({UserModel? user, bool isCreated});
+  $Res call(
+      {UserModel? user,
+      bool isCreated,
+      String? accessToken,
+      String? refreshToken});
 
   $UserModelCopyWith<$Res>? get user;
 }
@@ -55,6 +61,8 @@ class _$LoginResponseModelCopyWithImpl<$Res, $Val extends LoginResponseModel>
   $Res call({
     Object? user = freezed,
     Object? isCreated = null,
+    Object? accessToken = freezed,
+    Object? refreshToken = freezed,
   }) {
     return _then(_value.copyWith(
       user: freezed == user
@@ -65,6 +73,14 @@ class _$LoginResponseModelCopyWithImpl<$Res, $Val extends LoginResponseModel>
           ? _value.isCreated
           : isCreated // ignore: cast_nullable_to_non_nullable
               as bool,
+      accessToken: freezed == accessToken
+          ? _value.accessToken
+          : accessToken // ignore: cast_nullable_to_non_nullable
+              as String?,
+      refreshToken: freezed == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -89,7 +105,11 @@ abstract class _$$LoginResponseModelImplCopyWith<$Res>
       __$$LoginResponseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({UserModel? user, bool isCreated});
+  $Res call(
+      {UserModel? user,
+      bool isCreated,
+      String? accessToken,
+      String? refreshToken});
 
   @override
   $UserModelCopyWith<$Res>? get user;
@@ -108,6 +128,8 @@ class __$$LoginResponseModelImplCopyWithImpl<$Res>
   $Res call({
     Object? user = freezed,
     Object? isCreated = null,
+    Object? accessToken = freezed,
+    Object? refreshToken = freezed,
   }) {
     return _then(_$LoginResponseModelImpl(
       user: freezed == user
@@ -118,6 +140,14 @@ class __$$LoginResponseModelImplCopyWithImpl<$Res>
           ? _value.isCreated
           : isCreated // ignore: cast_nullable_to_non_nullable
               as bool,
+      accessToken: freezed == accessToken
+          ? _value.accessToken
+          : accessToken // ignore: cast_nullable_to_non_nullable
+              as String?,
+      refreshToken: freezed == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -125,7 +155,11 @@ class __$$LoginResponseModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$LoginResponseModelImpl implements _LoginResponseModel {
-  const _$LoginResponseModelImpl({this.user, required this.isCreated});
+  const _$LoginResponseModelImpl(
+      {this.user,
+      required this.isCreated,
+      this.accessToken,
+      this.refreshToken});
 
   factory _$LoginResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginResponseModelImplFromJson(json);
@@ -134,10 +168,14 @@ class _$LoginResponseModelImpl implements _LoginResponseModel {
   final UserModel? user;
   @override
   final bool isCreated;
+  @override
+  final String? accessToken;
+  @override
+  final String? refreshToken;
 
   @override
   String toString() {
-    return 'LoginResponseModel(user: $user, isCreated: $isCreated)';
+    return 'LoginResponseModel(user: $user, isCreated: $isCreated, accessToken: $accessToken, refreshToken: $refreshToken)';
   }
 
   @override
@@ -147,12 +185,17 @@ class _$LoginResponseModelImpl implements _LoginResponseModel {
             other is _$LoginResponseModelImpl &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.isCreated, isCreated) ||
-                other.isCreated == isCreated));
+                other.isCreated == isCreated) &&
+            (identical(other.accessToken, accessToken) ||
+                other.accessToken == accessToken) &&
+            (identical(other.refreshToken, refreshToken) ||
+                other.refreshToken == refreshToken));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, user, isCreated);
+  int get hashCode =>
+      Object.hash(runtimeType, user, isCreated, accessToken, refreshToken);
 
   @JsonKey(ignore: true)
   @override
@@ -172,7 +215,9 @@ class _$LoginResponseModelImpl implements _LoginResponseModel {
 abstract class _LoginResponseModel implements LoginResponseModel {
   const factory _LoginResponseModel(
       {final UserModel? user,
-      required final bool isCreated}) = _$LoginResponseModelImpl;
+      required final bool isCreated,
+      final String? accessToken,
+      final String? refreshToken}) = _$LoginResponseModelImpl;
 
   factory _LoginResponseModel.fromJson(Map<String, dynamic> json) =
       _$LoginResponseModelImpl.fromJson;
@@ -181,6 +226,10 @@ abstract class _LoginResponseModel implements LoginResponseModel {
   UserModel? get user;
   @override
   bool get isCreated;
+  @override
+  String? get accessToken;
+  @override
+  String? get refreshToken;
   @override
   @JsonKey(ignore: true)
   _$$LoginResponseModelImplCopyWith<_$LoginResponseModelImpl> get copyWith =>

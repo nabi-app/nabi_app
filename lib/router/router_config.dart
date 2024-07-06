@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/di/di_setup.dart';
+import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
 import 'package:nabi_app/presentaion/login/login_view.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
-import 'package:nabi_app/presentaion/main/diary/diary_tab.dart';
-import 'package:nabi_app/presentaion/main/home/home_tab.dart';
+import 'package:nabi_app/presentaion/diary/diary_page.dart';
+import 'package:nabi_app/presentaion/home/home_page.dart';
 import 'package:nabi_app/presentaion/main/main_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view_model.dart';
 import 'package:nabi_app/presentaion/splash/splash_view.dart';
 import 'package:nabi_app/presentaion/splash/splash_view_model.dart';
+import 'package:nabi_app/user/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey();
+
+BuildContext? get rootContext => rootNavigatorKey.currentContext;
 
 final GoRouter routerConfig = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -38,8 +42,8 @@ final GoRouter routerConfig = GoRouter(
     GoRoute(
       path: "/sign-up",
       name: SignUpView.name,
-      builder: (_, __) => ChangeNotifierProvider(
-        create: (_) => getIt<SignUpViewModel>(),
+      builder: (_, state) => ChangeNotifierProvider(
+        create: (_) => getIt<SignUpViewModel>(param1: state.extra as SignUpTransmissionModel),
         builder: (_, __) => const SignUpView(),
       ),
     ),
@@ -54,9 +58,9 @@ final GoRouter routerConfig = GoRouter(
           routes: [
             GoRoute(
               path: "/home",
-              name: HomeTab.name,
+              name: HomePage.name,
               pageBuilder: (_, __) => const NoTransitionPage(
-                child: HomeTab(),
+                child: HomePage(),
               ),
             ),
           ],
@@ -65,9 +69,9 @@ final GoRouter routerConfig = GoRouter(
           routes: [
             GoRoute(
               path: "/diary",
-              name: DiaryTab.name,
+              name: DiaryPage.name,
               pageBuilder: (_, __) => const NoTransitionPage(
-                child: DiaryTab(),
+                child: DiaryPage(),
               ),
             ),
           ],
@@ -78,4 +82,6 @@ final GoRouter routerConfig = GoRouter(
       ),
     ),
   ],
+  refreshListenable: getIt<AuthProvider>(),
+  redirect: getIt<AuthProvider>().redirection,
 );

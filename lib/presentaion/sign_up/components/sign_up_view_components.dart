@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
-import 'package:nabi_app/ui/assets.gen.dart';
+import 'package:nabi_app/enum/sign_up_term_type.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
+import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignUpPageTitle extends StatelessWidget {
@@ -124,15 +125,13 @@ class SignUpDuplicationCheckButton extends StatelessWidget {
 
 
 class SignUpTermItem extends StatelessWidget {
-  final String text;
-  final String? linkUrl;
+  final SignUpTermType term;
   final bool selected;
-  final VoidCallback onSelected;
+  final void Function(SignUpTermType term) onSelected;
 
   const SignUpTermItem({
     super.key,
-    required this.text,
-    this.linkUrl,
+    required this.term,
     required this.selected,
     required this.onSelected,
   });
@@ -150,7 +149,7 @@ class SignUpTermItem extends StatelessWidget {
 
   Widget _buildButton() {
     return GestureDetector(
-      onTap: onSelected,
+      onTap: () => onSelected(term),
       behavior: HitTestBehavior.translucent,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -164,7 +163,7 @@ class SignUpTermItem extends StatelessWidget {
   Widget _buildText() {
     return Expanded(
       child: Text(
-        text,
+        term.text,
         style: const TextStyle(
           color: color999DAC,
           fontSize: 16,
@@ -176,10 +175,10 @@ class SignUpTermItem extends StatelessWidget {
   }
 
   Widget _buildLinkButton() {
-    if (linkUrl == null) return const SizedBox.shrink();
+    if (term.link == null) return const SizedBox.shrink();
 
     return GestureDetector(
-      onTap: () => launchUrl(Uri.parse(linkUrl!)),
+      onTap: () => launchUrl(Uri.parse(term.link!)),
       behavior: HitTestBehavior.translucent,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

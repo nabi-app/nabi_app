@@ -13,6 +13,8 @@ _$LoginResponseModelImpl _$$LoginResponseModelImplFromJson(
           ? null
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
       isCreated: json['isCreated'] as bool,
+      accessToken: json['accessToken'] as String?,
+      refreshToken: json['refreshToken'] as String?,
     );
 
 Map<String, dynamic> _$$LoginResponseModelImplToJson(
@@ -20,4 +22,6 @@ Map<String, dynamic> _$$LoginResponseModelImplToJson(
     <String, dynamic>{
       'user': instance.user,
       'isCreated': instance.isCreated,
+      'accessToken': instance.accessToken,
+      'refreshToken': instance.refreshToken,
     };

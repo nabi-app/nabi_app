@@ -2,13 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nabi_app/utils/components/bottom_button.dart';
-import 'package:nabi_app/utils/components/custom_scaffold.dart';
+import 'package:nabi_app/enum/sign_up_term_type.dart';
+import 'package:nabi_app/utils/ui/components/bottom_button.dart';
+import 'package:nabi_app/utils/ui/components/custom_scaffold.dart';
 import 'package:nabi_app/presentaion/sign_up/components/sign_up_view_components.dart';
-import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view_model.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
-import 'package:nabi_app/ui/assets.gen.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
+import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:provider/provider.dart';
 
 class SignUpView extends StatefulWidget {
@@ -98,7 +98,7 @@ class _SignUpViewState extends State<SignUpView> {
 
   bool _buttonEnable(SignUpViewModel viewModel) {
     if (currentPage == 0) {
-      return true;
+      return viewModel.agreedNecessaryTerms;
     }
 
     if (currentPage == 1) {
@@ -124,7 +124,7 @@ class _SignUpViewState extends State<SignUpView> {
 
   void _onNextTap() async {
     if (currentPage == 2) {
-      context.goNamed(SignUpCompleteView.name);
+      context.read<SignUpViewModel>().signUp();
       return;
     }
 
@@ -144,9 +144,7 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  void _unfocus() {
-    FocusScope.of(context).unfocus();
-  }
+  void _unfocus() => FocusScope.of(context).unfocus();
 }
 
 class _SignUpTermsPage extends StatelessWidget {
@@ -164,30 +162,27 @@ class _SignUpTermsPage extends StatelessWidget {
           const SignUpPageTitle(title: "이용 약관에 대한 동의가\n필요해요!"),
           SizedBox(height: 50.w),
           SignUpTermItem(
-            text: "만 14세 이상입니다 (필수)",
-            selected: true,
-            onSelected: () {},
+            term: SignUpTermType.olderAge14,
+            selected: viewModel.terms.contains(SignUpTermType.olderAge14),
+            onSelected: viewModel.onTermSelected,
           ),
           SizedBox(height: 20.w),
           SignUpTermItem(
-            text: "서비스 이용약관 동의 (필수)",
-            selected: false,
-            linkUrl: "",
-            onSelected: () => viewModel.onTermSelected(),
+            term: SignUpTermType.serviceUsage,
+            selected: viewModel.terms.contains(SignUpTermType.serviceUsage),
+            onSelected: viewModel.onTermSelected,
           ),
           SizedBox(height: 20.w),
           SignUpTermItem(
-            text: "개인정보 수집 방침 안내 (필수)",
-            selected: true,
-            linkUrl: "",
-            onSelected: () {},
+            term: SignUpTermType.privacy,
+            selected: viewModel.terms.contains(SignUpTermType.privacy),
+            onSelected: viewModel.onTermSelected,
           ),
           SizedBox(height: 20.w),
           SignUpTermItem(
-            text: "이벤트 마케팅 수신 동의 (선택)",
-            selected: false,
-            linkUrl: "",
-            onSelected: () {},
+            term: SignUpTermType.marketing,
+            selected: viewModel.terms.contains(SignUpTermType.marketing),
+            onSelected: viewModel.onTermSelected,
           ),
         ],
       ),

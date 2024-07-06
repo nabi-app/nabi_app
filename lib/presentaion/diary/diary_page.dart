@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DiaryTab extends StatelessWidget {
-  const DiaryTab({super.key});
+class DiaryPage extends StatelessWidget {
+  const DiaryPage({super.key});
 
   static const String name = "diary";
 

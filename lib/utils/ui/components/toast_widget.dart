@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nabi_app/router/router_config.dart';
-import 'package:nabi_app/ui/ui_theme.dart';
+import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 void showToast({required String message}) {
   final fToast = FToast();
 
-  final context = rootNavigatorKey.currentContext;
+  final context = rootContext;
 
   if (context == null) return;
 
