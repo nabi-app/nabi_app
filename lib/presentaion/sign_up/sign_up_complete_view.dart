@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nabi_app/presentaion/home/home_page.dart';
+import 'package:nabi_app/presentaion/goal/goal_page.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 class SignUpCompleteView extends StatelessWidget {
   const SignUpCompleteView({super.key});
 
-  static const String name = "signUpComplete";
+  static const String path = "/sign-up-complete";
+  static const String name = "SignUpCompleteView";
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,7 @@ class SignUpCompleteView extends StatelessWidget {
             ),
             SizedBox(height: 130.w,),
             GestureDetector(
-              onTap: () => context.goNamed(HomePage.name),
+              onTap: () => context.goNamed(GoalPage.name),
               child: Container(
                 width: 220.w,
                 height: 52.w,

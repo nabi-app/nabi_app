@@ -34,6 +34,9 @@ class $AssetsSvgGen {
   SvgGenImage get iconCalendar =>
       const SvgGenImage('assets/svg/icon_calendar.svg');
 
+  /// File path: assets/svg/icon_check.svg
+  SvgGenImage get iconCheck => const SvgGenImage('assets/svg/icon_check.svg');
+
   /// File path: assets/svg/icon_circle_add.svg
   SvgGenImage get iconCircleAdd =>
       const SvgGenImage('assets/svg/icon_circle_add.svg');
@@ -67,6 +70,7 @@ class $AssetsSvgGen {
         iconArrowLeft,
         iconArrowRight,
         iconCalendar,
+        iconCheck,
         iconCircleAdd,
         iconCircleCheck,
         iconCircleEmpty,

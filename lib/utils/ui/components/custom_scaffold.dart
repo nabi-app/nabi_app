@@ -15,10 +15,11 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: appBar,
         resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        backgroundColor: Colors.white,
         body: body,
       ),
     );

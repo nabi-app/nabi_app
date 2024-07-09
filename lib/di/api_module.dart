@@ -9,7 +9,7 @@ import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/constants.dart';
 import 'package:nabi_app/utils/ui/components/toast_widget.dart';
-import 'package:nabi_app/utils/ui/logger.dart';
+import 'package:nabi_app/utils/logger.dart';
 import 'package:provider/provider.dart';
 
 class BaseInterceptor extends Interceptor {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/router/router_config.dart';
@@ -15,7 +16,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  await dotenv.load(fileName: ".env");
+  await Future.wait(
+    [
+      initializeDateFormatting(),
+      dotenv.load(fileName: ".env"),
+    ],
+  );
 
   configureDependencies();
 
@@ -40,7 +46,6 @@ void main() async {
         child: MaterialApp.router(
           title: "나비 앱",
           theme: theme,
-          darkTheme: dartTheme,
           builder: FToastBuilder(),
           routerConfig: routerConfig,
         ),

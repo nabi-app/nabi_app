@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/model/user_model.dart';
+import 'package:nabi_app/presentaion/goal/goal_page.dart';
+import 'package:nabi_app/presentaion/login/login_view.dart';
+import 'package:nabi_app/presentaion/sign_up/sign_up_view.dart';
+import 'package:nabi_app/presentaion/splash/splash_view.dart';
 import 'package:nabi_app/utils/constants.dart';
 
 @singleton
@@ -32,9 +36,9 @@ class AuthProvider extends ChangeNotifier {
     final path = state.fullPath;
 
     if (_userInfo == null) {
-      return path == "/" || path == "/login" || path == "/sign-up" ? null : "/login";
+      return path == SplashView.path || path == LoginView.path || path == SignUpView.path ? null : LoginView.path;
     }
 
-    return path == "/" || path == "/login" ? "/home" : null;
+    return path == SplashView.path || path == LoginView.path ? GoalPage.path : null;
   }
 }
