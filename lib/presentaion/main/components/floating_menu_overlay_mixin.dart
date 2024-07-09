@@ -29,7 +29,7 @@ mixin FloatingMenuOverlayMixin<MainView extends StatefulWidget> on State<MainVie
     overlayState.insert(_entry!);
   }
 
-  void removeOverlay() {
+  void hideOverlay() {
     _entry?.remove();
   }
 
@@ -43,7 +43,7 @@ mixin FloatingMenuOverlayMixin<MainView extends StatefulWidget> on State<MainVie
       child: Stack(
         children: [
           GestureDetector(
-            onTap: removeOverlay,
+            onTap: hideOverlay,
             child: Container(
               color: Colors.black.withOpacity(0.5),
               width: double.infinity,
@@ -68,7 +68,7 @@ mixin FloatingMenuOverlayMixin<MainView extends StatefulWidget> on State<MainVie
               child: MainFloatingActionButton(
                 color: Colors.white,
                 child: Assets.svg.iconClose.svg(width: 24.w, height: 24.w),
-                onPressed: () => removeOverlay(),
+                onPressed: () => hideOverlay(),
               ),
             ),
           ),

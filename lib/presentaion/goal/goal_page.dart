@@ -1,77 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabi_app/presentaion/home/components/home_page_components.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
+import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
+import 'package:nabi_app/utils/ui/components/custom_dialog.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
-import 'package:nabi_app/user/auth_provider.dart';
-import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class GoalPage extends StatelessWidget {
+  const GoalPage({super.key});
 
-  static const String name = "home";
+  static const String path = "/goal";
+  static const String name = "GoalPage";
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 30.w, 16.w, 10.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildTitle(),
-                _buildProfile(context),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: 10.w),
-                  _buildCategoryGrid(),
-                  SizedBox(height: 30.w),
-                  _buildGoalListTitle(),
-                  SizedBox(height: 20.w),
-                  _buildGoalList(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTitle() {
-    return Text(
-      "나의 목표",
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
-        fontSize: 32.sp,
-        height: 1.125,
-        leadingDistribution: TextLeadingDistribution.even,
-      ),
-    );
-  }
-
-  Widget _buildProfile(BuildContext context) {
-    final imageUrl = context.read<AuthProvider>().userInfo!.profileImage;
-
-    return Container(
-      height: 44.w,
-      width: 44.w,
-      decoration: BoxDecoration(
-        color: Colors.pink,
-        shape: BoxShape.circle,
-        image: imageUrl?.isEmpty ?? true
-            ? null
-            : DecorationImage(
-                image: NetworkImage(imageUrl!),
-                fit: BoxFit.cover,
-              ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 10.w),
+            _buildCategoryGrid(),
+            SizedBox(height: 30.w),
+            _buildGoalListTitle(),
+            SizedBox(height: 20.w),
+            _buildGoalList(),
+          ],
+        ),
       ),
     );
   }
@@ -154,12 +108,21 @@ class HomePage extends StatelessWidget {
       padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 16.w),
       itemCount: goalList.length,
       separatorBuilder: (_, __) => SizedBox(height: 14.w),
-      itemBuilder: (_, index) {
+      itemBuilder: (context, index) {
         final goal = goalList[index];
 
         return GoalCard(
           title: "전화해서 알아보기",
           progress: 70,
+          onTap: () => context.pushNamed(GoalWriteView.name),
+          onCheck: () {
+            showCustomDialog(
+              title: "완료할까요?",
+              subTitle: "하위 할 일이 완료되지 않았는데 강제로 완료할까요?",
+              button1Text: "아니요",
+              button2Text: "완료",
+            );
+          },
         );
       },
     );

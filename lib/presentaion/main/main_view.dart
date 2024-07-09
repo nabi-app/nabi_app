@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/main/components/floating_menu_overlay_mixin.dart';
 import 'package:nabi_app/presentaion/main/components/main_view_components.dart';
+import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
+import 'package:provider/provider.dart';
 
 class MainView extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -22,15 +25,68 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   final LayerLink _layerLink = LayerLink();
 
+  String get _titleText => widget.navigationShell.currentIndex == 0 ? "나의 목표" : "일기";
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
     return Scaffold(
+      appBar: _buildAppBar(),
       backgroundColor: colorEBEDF5,
       body: widget.navigationShell,
       floatingActionButton: _buildFloatingActionButton(),
       bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      toolbarHeight: 84.w,
+      titleSpacing: 0,
+      forceMaterialTransparency: true,
+      title: Padding(
+        padding: EdgeInsets.fromLTRB(16.w, 30.w, 16.w, 10.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildTitle(),
+            _buildProfile(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      _titleText,
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w700,
+        fontSize: 32.sp,
+        height: 1.125,
+        leadingDistribution: TextLeadingDistribution.even,
+      ),
+    );
+  }
+
+  Widget _buildProfile(BuildContext context) {
+    final imageUrl = context.read<AuthProvider>().userInfo!.profileImage;
+
+    return Container(
+      height: 44.w,
+      width: 44.w,
+      decoration: BoxDecoration(
+        color: Colors.pink,
+        shape: BoxShape.circle,
+        image: imageUrl?.isEmpty ?? true
+            ? null
+            : DecorationImage(
+          image: NetworkImage(imageUrl!),
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 
@@ -55,7 +111,10 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
               ),
               MainPopupMenuItem(
                 title: "목표 추가",
-                onTap: () {},
+                onTap: () {
+                  hideOverlay();
+                  context.pushNamed(GoalWriteView.name);
+                },
               ),
             ],
           ),

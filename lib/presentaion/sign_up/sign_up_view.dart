@@ -14,7 +14,8 @@ import 'package:provider/provider.dart';
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
 
-  static const String name = "signUp";
+  static const String path = "/sign-up";
+  static const String name = "SignUpView";
 
   @override
   State<SignUpView> createState() => _SignUpViewState();

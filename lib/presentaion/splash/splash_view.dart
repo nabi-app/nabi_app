@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
 
-  static const String name = "splash";
+  static const String path = "/";
+  static const String name = "SplashView";
 
   @override
   State<SplashView> createState() => _SplashViewState();

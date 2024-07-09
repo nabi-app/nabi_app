@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
+import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
+import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
+import 'package:nabi_app/presentaion/goal/goal_page.dart';
 import 'package:nabi_app/presentaion/login/login_view.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_page.dart';
-import 'package:nabi_app/presentaion/home/home_page.dart';
 import 'package:nabi_app/presentaion/main/main_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view.dart';
@@ -21,10 +23,10 @@ BuildContext? get rootContext => rootNavigatorKey.currentContext;
 
 final GoRouter routerConfig = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: "/",
+  initialLocation: SplashView.path,
   routes: [
     GoRoute(
-      path: "/",
+      path: SplashView.path,
       name: SplashView.name,
       builder: (_, __) => ChangeNotifierProvider(
         create: (_) => getIt<SplashViewModel>(),
@@ -32,7 +34,7 @@ final GoRouter routerConfig = GoRouter(
       ),
     ),
     GoRoute(
-      path: "/login",
+      path: LoginView.path,
       name: LoginView.name,
       builder: (_, __) => ChangeNotifierProvider(
         create: (_) => getIt<LoginViewModel>(),
@@ -40,7 +42,7 @@ final GoRouter routerConfig = GoRouter(
       ),
     ),
     GoRoute(
-      path: "/sign-up",
+      path: SignUpView.path,
       name: SignUpView.name,
       builder: (_, state) => ChangeNotifierProvider(
         create: (_) => getIt<SignUpViewModel>(param1: state.extra as SignUpTransmissionModel),
@@ -48,7 +50,7 @@ final GoRouter routerConfig = GoRouter(
       ),
     ),
     GoRoute(
-      path: "/sign-up-complete",
+      path: SignUpCompleteView.path,
       name: SignUpCompleteView.name,
       builder: (_, __) => const SignUpCompleteView(),
     ),
@@ -57,10 +59,10 @@ final GoRouter routerConfig = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: "/home",
-              name: HomePage.name,
+              path: GoalPage.path,
+              name: GoalPage.name,
               pageBuilder: (_, __) => const NoTransitionPage(
-                child: HomePage(),
+                child: GoalPage(),
               ),
             ),
           ],
@@ -68,7 +70,7 @@ final GoRouter routerConfig = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: "/diary",
+              path: DiaryPage.path,
               name: DiaryPage.name,
               pageBuilder: (_, __) => const NoTransitionPage(
                 child: DiaryPage(),
@@ -79,6 +81,14 @@ final GoRouter routerConfig = GoRouter(
       ],
       builder: (_, __, navigationShell) => MainView(
         navigationShell: navigationShell,
+      ),
+    ),
+    GoRoute(
+      path: GoalWriteView.path,
+      name: GoalWriteView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<GoalWriteViewModel>(),
+        builder: (_, __) => const GoalWriteView(),
       ),
     ),
   ],

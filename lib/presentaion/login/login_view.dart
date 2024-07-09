@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
-  static const String name = "login";
+  static const String path = "/login";
+  static const String name = "LoginView";
 
   @override
   Widget build(BuildContext context) {
