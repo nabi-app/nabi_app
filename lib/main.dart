@@ -12,6 +12,7 @@ import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/constants.dart';
 import 'package:provider/provider.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

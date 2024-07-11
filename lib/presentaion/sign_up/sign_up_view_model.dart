@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
-import 'package:nabi_app/di/di_setup.dart';
+import 'package:nabi_app/domain/model/nickname_duplicate_check_request.dart';
 import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
 import 'package:nabi_app/domain/repository/user_auth_repository.dart';
 import 'package:nabi_app/enum/sign_up_term_type.dart';
@@ -12,7 +11,6 @@ import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/utils/ui/components/toast_widget.dart';
 import 'package:nabi_app/user/auth_provider.dart';
-import 'package:nabi_app/utils/constants.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -83,9 +81,18 @@ class SignUpViewModel extends ChangeNotifier {
   }
 
   Future<void> checkDuplication() async {
-    _tryNicknameDuplicationCheck = true;
-    _passNicknameDuplicationCheck = true;
-    notifyListeners();
+    try {
+      _tryNicknameDuplicationCheck = true;
+
+      final result = await _repository.checkNicknameDuplicated(
+        NicknameDuplicateCheckRequest(nickname: _nickname),
+      );
+
+      _passNicknameDuplicationCheck = result;
+      notifyListeners();
+    } catch (e) {
+      showToast(message: "잠시 후에 다시 시도해주세요.");
+    }
   }
 
   Future<void> pickProfileImage() async {
@@ -129,22 +136,14 @@ class SignUpViewModel extends ChangeNotifier {
         file: _profileImage,
       );
 
-      final storage = getIt<FlutterSecureStorage>();
+      final authProvider = rootContext?.read<AuthProvider>();
 
-      await Future.wait(
-        [
-          storage.write(
-            key: accessTokenKey,
-            value: response.accessToken,
-          ),
-          storage.write(
-            key: refreshTokenKey,
-            value: response.refreshToken,
-          ),
-        ],
+      await authProvider?.updateToken(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
       );
 
-      rootContext?.read<AuthProvider>().updateUserInfo(response.user);
+      authProvider?.updateUserInfo(response.user);
 
       rootContext?.goNamed(SignUpCompleteView.name);
     } catch (e) {

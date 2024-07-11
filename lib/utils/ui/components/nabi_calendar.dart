@@ -39,6 +39,7 @@ class _NabiCalendarState extends State<NabiCalendar> {
       selectedDayPredicate: (date) => widget.selectedDay == null ? false : date.compareTo(widget.selectedDay!) == 0,
       onDaySelected: widget.onDaySelected,
       locale: "ko_KR",
+      availableGestures: AvailableGestures.horizontalSwipe,
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarBuilders: CalendarBuilders(
           headerTitleBuilder: _headerTitleBuilder,

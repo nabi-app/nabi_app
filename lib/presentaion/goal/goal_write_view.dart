@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:nabi_app/data/notification/local_notification.dart';
 import 'package:nabi_app/domain/model/todo_item_model.dart';
 import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
@@ -56,11 +57,24 @@ class GoalWriteView extends StatelessWidget {
 
   Widget _buildSaveButton() {
     return Consumer<GoalWriteViewModel>(
-      builder: (_, viewModel, __) => Padding(
+      builder: (context, viewModel, __) => Padding(
         padding: EdgeInsets.only(right: 16.w),
         child: RoundedBorderButton(
           text: "저장하기",
-          onTap: viewModel.title.isEmpty || viewModel.description.isEmpty ? null : () {},
+          onTap: viewModel.title.isEmpty || viewModel.description.isEmpty
+              ? null
+              : () async {
+                  if (viewModel.goalDay == null || viewModel.notificationTime == null) return;
+
+                  scheduleNotification(
+                    viewModel.goalDay!.copyWith(
+                      hour: viewModel.calculateHour(),
+                      minute: viewModel.notificationTime!.minute,
+                    ),
+                  );
+
+                  context.pop();
+                },
         ),
       ),
     );
@@ -107,16 +121,12 @@ class GoalWriteView extends StatelessWidget {
       children: [
         _buildTitle("목표 기간"),
         GestureDetector(
-          onTap: () async {
-            final viewModel = context.read<GoalWriteViewModel>();
-
-            final result = await showCalendarBottomSheet(
-              context,
-              selectedDay: viewModel.goalDay,
-            );
-
-            viewModel.onGoalDayChanged(result);
-          },
+          onTap: () => showCalendarBottomSheet(
+            context,
+            selectedDay: context.read<GoalWriteViewModel>().goalDay,
+          ).then(
+            context.read<GoalWriteViewModel>().onGoalDayChanged,
+          ),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 10.w),
             child: Selector<GoalWriteViewModel, DateTime?>(
@@ -147,21 +157,23 @@ class GoalWriteView extends StatelessWidget {
   }
 
   Widget _buildNotificationSettingArea(BuildContext context) {
+    final viewModel = context.read<GoalWriteViewModel>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTitle("알림 설정"),
         GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
+          onTap: () => showModalBottomSheet<NotificationTime>(
               context: context,
               isScrollControlled: true,
-              builder: (_) => NotificationTimeSelectionBottomSheet(),
-            );
-          },
+              useSafeArea: true,
+              builder: (_) => NotificationTimeSelectionBottomSheet(selectedTime: viewModel.notificationTime)).then(
+            viewModel.onNotificationTimeChanged,
+          ),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 10.w),
-            child: Selector<GoalWriteViewModel, DateTime?>(
+            child: Selector<GoalWriteViewModel, NotificationTime?>(
               selector: (_, viewModel) => viewModel.notificationTime,
               builder: (_, notificationTime, __) => notificationTime == null
                   ? Text(
@@ -175,11 +187,11 @@ class GoalWriteView extends StatelessWidget {
                       ),
                     )
                   : _OutlinedInfoContainer(
-                      onClearTap: () {},
+                      onClearTap: context.read<GoalWriteViewModel>().clearNotificationTime,
                       prefixIcon: Assets.svg.iconClock.svg(
                         colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                       ),
-                      content: "",
+                      content: viewModel.notificationTimeText,
                     ),
             ),
           ),

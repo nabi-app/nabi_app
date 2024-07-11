@@ -1,6 +1,8 @@
+/// 토큰
 const String accessTokenKey = "accessToken";
 const String refreshTokenKey = "refreshToken";
 
+/// ENV
 const String domainUrlKey = "DOMAIN_URL";
 const String kakaoNativeAppKey = "KAKAO_NATIVE_APP_KEY";
 const String kakaoJavascriptAppKey = "KAKAO_JAVASCRIPT_APP_KEY";

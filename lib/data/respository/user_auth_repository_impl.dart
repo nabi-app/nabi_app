@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:nabi_app/data/source/user_auth_api.dart';
 import 'package:nabi_app/domain/model/login_request_model.dart';
 import 'package:nabi_app/domain/model/login_response_model.dart';
+import 'package:nabi_app/domain/model/nickname_duplicate_check_request.dart';
 import 'package:nabi_app/domain/model/sign_up_response_model.dart';
 import 'package:nabi_app/domain/model/token_refresh_response.dart';
 import 'package:nabi_app/domain/model/user_model.dart';
@@ -18,6 +19,16 @@ class UserAuthRepositoryImpl implements UserAuthRepository {
   @override
   Future<LoginResponseModel> login(LoginRequestModel body) {
     return _api.login(body);
+  }
+
+  @override
+  Future<bool> checkNicknameDuplicated(NicknameDuplicateCheckRequest body) {
+    return _api.checkNicknameDuplicated(body);
+  }
+
+  @override
+  Future<void> logout() {
+    return _api.logout();
   }
 
   @override
@@ -45,5 +56,10 @@ class UserAuthRepositoryImpl implements UserAuthRepository {
   @override
   Future<UserModel> getUserInfo() {
     return _api.getUserInfo();
+  }
+
+  @override
+  Future<void> withdraw() {
+    return _api.withdraw();
   }
 }
