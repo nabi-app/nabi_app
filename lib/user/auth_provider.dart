@@ -21,7 +21,24 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logout() async {
+  Future<void> updateToken({required String accessToken, required String refreshToken}) async {
+    final storage = getIt<FlutterSecureStorage>();
+
+    await Future.wait(
+      [
+        storage.write(
+          key: accessTokenKey,
+          value: accessToken,
+        ),
+        storage.write(
+          key: refreshTokenKey,
+          value: refreshToken,
+        ),
+      ],
+    );
+  }
+
+  Future<void> deleteToken() async {
     final storage = getIt<FlutterSecureStorage>();
     await Future.wait(
       [

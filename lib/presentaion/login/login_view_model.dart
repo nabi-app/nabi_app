@@ -1,13 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/model/login_request_model.dart';
 import 'package:nabi_app/domain/model/login_response_model.dart';
 import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
@@ -195,22 +192,14 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> _loginProcess(LoginResponseModel loginData) async {
     try {
-      final storage = getIt<FlutterSecureStorage>();
+      final authProvider = rootContext?.read<AuthProvider>();
 
-      await Future.wait(
-        [
-          storage.write(
-            key: accessTokenKey,
-            value: loginData.accessToken,
-          ),
-          storage.write(
-            key: refreshTokenKey,
-            value: loginData.refreshToken,
-          ),
-        ],
+      await authProvider?.updateToken(
+        accessToken: loginData.accessToken!,
+        refreshToken: loginData.refreshToken!,
       );
 
-      rootContext?.read<AuthProvider>().updateUserInfo(loginData.user);
+      authProvider?.updateUserInfo(loginData.user);
     } catch (e) {
       showToast(message: "나비 앱 로그인이 실패했습니다.");
     }

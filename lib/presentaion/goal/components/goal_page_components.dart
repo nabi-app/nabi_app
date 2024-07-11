@@ -1,8 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nabi_app/enum/notification_time_type.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/components/complete_button.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
@@ -229,17 +228,15 @@ class GoalProgressBarInfo extends StatelessWidget {
   }
 }
 
-enum TimeType {
-  morning("오전"),
-  afternoon("오후");
-
-  final String name;
-
-  const TimeType(this.name);
-}
+typedef NotificationTime = ({NotificationTimeType type, int hour, int minute});
 
 class NotificationTimeSelectionBottomSheet extends StatefulWidget {
-  const NotificationTimeSelectionBottomSheet({super.key});
+  final NotificationTime? selectedTime;
+
+  const NotificationTimeSelectionBottomSheet({
+    super.key,
+    this.selectedTime,
+  });
 
   @override
   State<NotificationTimeSelectionBottomSheet> createState() => _NotificationTimeSelectionBottomSheetState();
@@ -250,76 +247,86 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
 
   final List<int> minutes = const [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
-  TimeType? _timeType;
+  NotificationTimeType? _timeType;
   int? _hour;
   int? _minute;
 
   @override
+  void initState() {
+    super.initState();
+    _timeType = widget.selectedTime?.type;
+    _hour = widget.selectedTime?.hour;
+    _minute = widget.selectedTime?.minute;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 30.w,
-        right: 30.w,
-        bottom: MediaQuery.of(context).padding.bottom + 20.w,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.only(
+          left: 30.w,
+          right: 30.w,
+          bottom: MediaQuery.of(context).padding.bottom + 20.w,
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildBar(),
-          _buildTitle(),
-          SizedBox(height: 30.w),
-          Row(
-            children: [
-              _buildTimeTypeButton(TimeType.morning),
-              SizedBox(width: 10.w),
-              _buildTimeTypeButton(TimeType.afternoon),
-            ],
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          SizedBox(height: 30.w),
-          _buildTimeTitle("몇시로 설정할까요?"),
-          SizedBox(height: 14.w),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 14.w,
-            children: hours
-                .map(
-                  (hour) => _buildSmallSelectionButton(
-                    text: hour.toString(),
-                    selected: _hour == hour,
-                    onTap: () => setState(() => _hour = hour),
-                  ),
-                )
-                .toList(),
-          ),
-          SizedBox(height: 30.w),
-          _buildTimeTitle("몇분으로 할까요?"),
-          SizedBox(height: 14.w),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 14.w,
-            children: minutes
-                .map(
-                  (minute) => _buildSmallSelectionButton(
-                    text: minute.toString(),
-                    selected: _minute == minute,
-                    onTap: () => setState(() => _minute = minute),
-                  ),
-                )
-                .toList(),
-          ),
-          SizedBox(height: 30.w),
-          CompleteButton(
-            margin: EdgeInsets.zero,
-            onTap: _timeType == null || _hour == null || _minute == null ? null : () => context.pop(),
-          ),
-        ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildBar(),
+            _buildTitle(),
+            SizedBox(height: 30.w),
+            Row(
+              children: [
+                _buildTimeTypeButton(NotificationTimeType.morning),
+                SizedBox(width: 10.w),
+                _buildTimeTypeButton(NotificationTimeType.afternoon),
+              ],
+            ),
+            SizedBox(height: 30.w),
+            _buildTimeTitle("몇시로 설정할까요?"),
+            SizedBox(height: 14.w),
+            Wrap(
+              spacing: 10.w,
+              runSpacing: 14.w,
+              children: hours
+                  .map(
+                    (hour) => _buildSmallSelectionButton(
+                      text: hour.toString(),
+                      selected: _hour == hour,
+                      onTap: () => setState(() => _hour = hour),
+                    ),
+                  )
+                  .toList(),
+            ),
+            SizedBox(height: 30.w),
+            _buildTimeTitle("몇분으로 할까요?"),
+            SizedBox(height: 14.w),
+            Wrap(
+              spacing: 10.w,
+              runSpacing: 14.w,
+              children: minutes
+                  .map(
+                    (minute) => _buildSmallSelectionButton(
+                      text: minute == 0 ? minute.toString().padLeft(2, "0") : minute.toString(),
+                      selected: _minute == minute,
+                      onTap: () => setState(() => _minute = minute),
+                    ),
+                  )
+                  .toList(),
+            ),
+            SizedBox(height: 30.w),
+            CompleteButton(
+              margin: EdgeInsets.zero,
+              onTap: (_timeType == null || _hour == null || _minute == null) ? null : () => context.pop(_calculateTime()),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -350,7 +357,7 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
     );
   }
 
-  Widget _buildTimeTypeButton(TimeType type) {
+  Widget _buildTimeTypeButton(NotificationTimeType type) {
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _timeType = type),
@@ -422,4 +429,6 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
       ),
     );
   }
+
+  NotificationTime _calculateTime() => (type: _timeType!, hour: _hour!, minute: _minute!);
 }

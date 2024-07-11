@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nabi_app/data/notification/local_notification.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/main/components/floating_menu_overlay_mixin.dart';
 import 'package:nabi_app/presentaion/main/components/main_view_components.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class MainView extends StatefulWidget {
@@ -26,6 +28,23 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   final LayerLink _layerLink = LayerLink();
 
   String get _titleText => widget.navigationShell.currentIndex == 0 ? "나의 목표" : "일기";
+
+  @override
+  void initState() {
+    super.initState();
+    _requestNotificationPermission();
+    initializeNotification();
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    const permission = Permission.notification;
+    final isDenied = await permission.isDenied;
+    final isPermanentlyDenied = await permission.isPermanentlyDenied;
+
+    if (isDenied && !isPermanentlyDenied) {
+      Permission.notification.request();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +102,9 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
         image: imageUrl?.isEmpty ?? true
             ? null
             : DecorationImage(
-          image: NetworkImage(imageUrl!),
-          fit: BoxFit.cover,
-        ),
+                image: NetworkImage(imageUrl!),
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

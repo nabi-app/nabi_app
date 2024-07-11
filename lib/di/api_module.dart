@@ -40,7 +40,7 @@ class BaseInterceptor extends Interceptor {
 
     if (isTokenExpired) {
       if (err.requestOptions.path == "/auth/refresh") {
-        rootContext!.read<AuthProvider>().logout();
+        rootContext!.read<AuthProvider>().deleteToken();
         showToast(message: "다시 로그인 해주세요.");
         return handler.reject(err);
       }

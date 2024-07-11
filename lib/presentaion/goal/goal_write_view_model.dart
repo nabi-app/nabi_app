@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:nabi_app/domain/model/todo_item_model.dart';
+import 'package:nabi_app/enum/notification_time_type.dart';
+import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
 
 @injectable
 class GoalWriteViewModel extends ChangeNotifier {
@@ -16,9 +18,25 @@ class GoalWriteViewModel extends ChangeNotifier {
 
   DateTime? get goalDay => _goalDay;
 
-  DateTime? _notificationTime;
+  NotificationTime? _notificationTime;
 
-  DateTime? get notificationTime => _notificationTime;
+  NotificationTime? get notificationTime => _notificationTime;
+
+  String get notificationTimeText {
+    final minute = _notificationTime!.minute;
+
+    return "${calculateHour().toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")}";
+  }
+
+  int calculateHour() {
+    final hour = _notificationTime!.hour;
+
+    if (_notificationTime!.type == NotificationTimeType.morning) {
+      return hour != 12 ? hour : 0;
+    }
+
+    return hour != 12 ? hour + 12 : hour;
+  }
 
   List<TodoItemModel> _todoList = [];
 
@@ -46,6 +64,18 @@ class GoalWriteViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onNotificationTimeChanged(NotificationTime? value) {
+    if (value == null) return;
+
+    _notificationTime = value;
+    notifyListeners();
+  }
+
+  void clearNotificationTime() {
+    _notificationTime = null;
+    notifyListeners();
+  }
+
   void addTodoList(String? content) {
     if (content == null) return;
 
@@ -69,7 +99,10 @@ class GoalWriteViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTodo({required int index, required String? content,}) {
+  void updateTodo({
+    required int index,
+    required String? content,
+  }) {
     if (content == null) return;
 
     final oldTodo = _todoList[index];
