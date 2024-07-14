@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:nabi_app/data/notification/local_notification.dart';
 import 'package:nabi_app/domain/model/todo_item_model.dart';
 import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
+import 'package:nabi_app/presentaion/goal/nabi_custom_view.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/components/custom_scaffold.dart';
 import 'package:nabi_app/utils/ui/components/custom_text_field.dart';
 import 'package:nabi_app/utils/ui/components/nabi_calendar.dart';
-import 'package:nabi_app/utils/ui/components/rouded_border_button.dart';
+import 'package:nabi_app/utils/ui/components/outlined_border_action_button.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -56,26 +56,11 @@ class GoalWriteView extends StatelessWidget {
   }
 
   Widget _buildSaveButton() {
-    return Consumer<GoalWriteViewModel>(
-      builder: (context, viewModel, __) => Padding(
-        padding: EdgeInsets.only(right: 16.w),
-        child: RoundedBorderButton(
-          text: "저장하기",
-          onTap: viewModel.title.isEmpty || viewModel.description.isEmpty
-              ? null
-              : () async {
-                  if (viewModel.goalDay == null || viewModel.notificationTime == null) return;
-
-                  scheduleNotification(
-                    viewModel.goalDay!.copyWith(
-                      hour: viewModel.calculateHour(),
-                      minute: viewModel.notificationTime!.minute,
-                    ),
-                  );
-
-                  context.pop();
-                },
-        ),
+    return Selector<GoalWriteViewModel, String>(
+      selector: (_, viewModel) => viewModel.title,
+      builder: (context, title, __) => OutlinedBorderActionButton(
+        text: "저장하기",
+        onTap: title.isEmpty ? null : () => context.pushReplacementNamed(NabiCustomView.name),
       ),
     );
   }
@@ -95,8 +80,8 @@ class GoalWriteView extends StatelessWidget {
         fontWeight: FontWeight.w500,
         color: colorC6C8CF,
       ),
-      maxLines: 2,
       style: baseTextStyle,
+      textInputAction: TextInputAction.done,
       onChanged: context.read<GoalWriteViewModel>().onTitleChanged,
     );
   }
@@ -108,7 +93,6 @@ class GoalWriteView extends StatelessWidget {
         _buildTitle("목표 설명"),
         CustomTextField(
           hintText: "설명이 없어요. 설명을 입력해 추가해주세요.",
-          maxLines: 2,
           onChanged: context.read<GoalWriteViewModel>().onDescriptionChanged,
         ),
       ],
@@ -499,7 +483,8 @@ class _TodoTextFieldState extends State<_TodoTextField> {
                 Container(
                   width: double.infinity,
                   height: 1,
-                  color: colorE4D7ED,
+                  color: colorE4E7ED,
+                  margin: EdgeInsets.only(left: 20.w),
                 ),
                 _buildButtons(context),
               ],
@@ -534,22 +519,22 @@ class _TodoTextFieldState extends State<_TodoTextField> {
   Widget _buildButtons(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        right: 20.w,
         top: 11.w,
         bottom: 12.w,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          RoundedBorderButton(
-            onTap: () => context.pop(_value),
+          OutlinedBorderActionButton(
             text: "저장하기",
+            margin: EdgeInsets.only(right: 10.w),
+            onTap: () => context.pop(_value),
           ),
-          SizedBox(width: 10.w),
-          RoundedBorderButton(
-            onTap: context.pop,
-            activeColor: Colors.black,
+          OutlinedBorderActionButton(
             text: "취소",
+            activeColor: Colors.black,
+            margin: EdgeInsets.only(right: 20.w),
+            onTap: context.pop,
           ),
         ],
       ),

@@ -12,7 +12,7 @@ abstract interface class UserAuthRepository {
 
   Future<void> logout();
 
-  Future<bool> checkNicknameDuplicated(NicknameDuplicateCheckRequest body);
+  Future<String> checkNicknameDuplicated(NicknameDuplicateCheckRequest body);
 
   Future<SignUpResponseModel> signUp({
     required String email,

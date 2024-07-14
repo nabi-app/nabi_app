@@ -198,7 +198,7 @@ class GoalProgressBarInfo extends StatelessWidget {
       width: double.infinity,
       height: 8.w,
       decoration: BoxDecoration(
-        color: colorE4D7ED,
+        color: colorE4E7ED,
         borderRadius: BorderRadius.circular(100),
       ),
       child: FractionallySizedBox(

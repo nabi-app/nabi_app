@@ -22,7 +22,7 @@ class UserAuthRepositoryImpl implements UserAuthRepository {
   }
 
   @override
-  Future<bool> checkNicknameDuplicated(NicknameDuplicateCheckRequest body) {
+  Future<String> checkNicknameDuplicated(NicknameDuplicateCheckRequest body) {
     return _api.checkNicknameDuplicated(body);
   }
 

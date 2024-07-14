@@ -37,20 +37,19 @@ void main() async {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
-          child: child!,
+          child: MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
+            ],
+            child: MaterialApp.router(
+              title: "나비 앱",
+              theme: theme,
+              builder: FToastBuilder(),
+              routerConfig: routerConfig,
+            ),
+          ),
         );
       },
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
-        ],
-        child: MaterialApp.router(
-          title: "나비 앱",
-          theme: theme,
-          builder: FToastBuilder(),
-          routerConfig: routerConfig,
-        ),
-      ),
     ),
   );
 }

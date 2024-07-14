@@ -232,7 +232,7 @@ class _SignUpPageViewState extends State<SignUpPageView> {
     return Container(
       width: double.infinity,
       height: 2,
-      color: colorE4D7ED,
+      color: colorE4E7ED,
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: _widthFactor,
