@@ -88,7 +88,7 @@ class SignUpViewModel extends ChangeNotifier {
         NicknameDuplicateCheckRequest(nickname: _nickname),
       );
 
-      _passNicknameDuplicationCheck = result;
+      _passNicknameDuplicationCheck = bool.parse(result);
       notifyListeners();
     } catch (e) {
       showToast(message: "잠시 후에 다시 시도해주세요.");

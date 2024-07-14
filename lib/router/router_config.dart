@@ -5,6 +5,8 @@ import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
 import 'package:nabi_app/presentaion/goal/goal_page.dart';
+import 'package:nabi_app/presentaion/goal/nabi_custom_view.dart';
+import 'package:nabi_app/presentaion/goal/nabi_custom_view_model.dart';
 import 'package:nabi_app/presentaion/login/login_view.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_page.dart';
@@ -89,6 +91,14 @@ final GoRouter routerConfig = GoRouter(
       builder: (_, __) => ChangeNotifierProvider(
         create: (_) => getIt<GoalWriteViewModel>(),
         builder: (_, __) => const GoalWriteView(),
+      ),
+    ),
+    GoRoute(
+      path: NabiCustomView.path,
+      name: NabiCustomView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<NabiCustomViewModel>(),
+        builder: (_, __) => const NabiCustomView(),
       ),
     ),
   ],

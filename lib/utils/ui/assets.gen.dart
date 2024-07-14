@@ -59,9 +59,16 @@ class $AssetsSvgGen {
   SvgGenImage get iconKakaoLogin =>
       const SvgGenImage('assets/svg/icon_kakao_login.svg');
 
+  /// File path: assets/svg/icon_nabi.svg
+  SvgGenImage get iconNabi => const SvgGenImage('assets/svg/icon_nabi.svg');
+
   /// File path: assets/svg/icon_profile.svg
   SvgGenImage get iconProfile =>
       const SvgGenImage('assets/svg/icon_profile.svg');
+
+  /// File path: assets/svg/icon_shuffle.svg
+  SvgGenImage get iconShuffle =>
+      const SvgGenImage('assets/svg/icon_shuffle.svg');
 
   /// List of all assets
   List<SvgGenImage> get values => [
@@ -77,7 +84,9 @@ class $AssetsSvgGen {
         iconClock,
         iconClose,
         iconKakaoLogin,
-        iconProfile
+        iconNabi,
+        iconProfile,
+        iconShuffle
       ];
 }
 

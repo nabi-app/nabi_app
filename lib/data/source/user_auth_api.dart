@@ -23,7 +23,7 @@ abstract class UserAuthApi {
   Future<void> logout();
   
   @POST("/user/name-check")
-  Future<bool> checkNicknameDuplicated(@Body() NicknameDuplicateCheckRequest body);
+  Future<String> checkNicknameDuplicated(@Body() NicknameDuplicateCheckRequest body);
 
   @POST("/auth/create-account")
   @MultiPart()

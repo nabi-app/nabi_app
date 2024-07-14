@@ -18,7 +18,7 @@ class BottomButton extends StatelessWidget {
     return KeyboardVisibilityBuilder(
       builder: (_, isKeyboardVisible) {
         return ColoredBox(
-          color: colorE4D7ED,
+          color: colorE4E7ED,
           child: Container(
             width: double.infinity,
             height: 52.w,

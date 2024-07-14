@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 
-class RoundedBorderButton extends StatelessWidget {
-  final VoidCallback? onTap;
+class OutlinedBorderActionButton extends StatelessWidget {
   final String text;
+  final VoidCallback? onTap;
   final Color activeColor;
   final Color inactiveColor;
+  final EdgeInsetsGeometry? margin;
 
-  const RoundedBorderButton({
+  const OutlinedBorderActionButton({
     super.key,
-    required this.onTap,
     required this.text,
+    required this.onTap,
     this.activeColor = color3373F1,
     this.inactiveColor = color999DAC,
+    this.margin,
   });
 
   bool get active => onTap != null;
@@ -26,6 +28,7 @@ class RoundedBorderButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 11.w),
+        margin: margin ?? EdgeInsets.only(right: 16.w),
         height: 28.w,
         alignment: Alignment.center,
         decoration: BoxDecoration(

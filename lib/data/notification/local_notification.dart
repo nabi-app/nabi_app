@@ -6,7 +6,7 @@ import 'package:timezone/timezone.dart' as tz;
 void initializeNotification() {
   const androidSettings = AndroidInitializationSettings("@mipmap/ic_launcher");
   const iosSettings = DarwinInitializationSettings(
-    requestSoundPermission: false,
+    requestSoundPermission: true,
     requestBadgePermission: false,
     requestAlertPermission: true,
   );
@@ -49,7 +49,7 @@ Future<void> scheduleNotification(DateTime date) async {
   );
 
   await getIt<FlutterLocalNotificationsPlugin>().zonedSchedule(
-    0,
+    (DateTime.now().millisecondsSinceEpoch ~/ 1000).floor(),
     "title",
     "body",
     scheduledDate,

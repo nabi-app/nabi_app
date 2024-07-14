@@ -13,6 +13,8 @@ class CustomTextField extends StatefulWidget {
   final int? maxLength;
   final FocusNode? focusNode;
   final bool autoFocus;
+  final TextAlign textAlign;
+  final TextInputAction? textInputAction;
 
   const CustomTextField({
     super.key,
@@ -26,6 +28,8 @@ class CustomTextField extends StatefulWidget {
     this.maxLength,
     this.focusNode,
     this.autoFocus = false,
+    this.textAlign = TextAlign.start,
+    this.textInputAction,
   });
 
   @override
@@ -61,9 +65,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         height: 1.56,
         leadingDistribution: TextLeadingDistribution.even,
       ),
+      textAlign: widget.textAlign,
       minLines: 1,
       maxLines: widget.maxLines,
       maxLength: widget.maxLength,
+      textInputAction: widget.textInputAction,
       decoration: InputDecoration(
         isDense: true,
         counterText: "",
