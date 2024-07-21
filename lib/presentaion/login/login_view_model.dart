@@ -12,7 +12,7 @@ import 'package:nabi_app/domain/repository/user_auth_repository.dart';
 import 'package:nabi_app/enum/login_type.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view.dart';
 import 'package:nabi_app/router/router_config.dart';
-import 'package:nabi_app/utils/ui/components/toast_widget.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/constants.dart';
 import 'package:provider/provider.dart';

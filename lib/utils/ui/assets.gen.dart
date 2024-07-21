@@ -18,6 +18,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/icon_add.svg
   SvgGenImage get iconAdd => const SvgGenImage('assets/svg/icon_add.svg');
 
+  /// File path: assets/svg/icon_album.svg
+  SvgGenImage get iconAlbum => const SvgGenImage('assets/svg/icon_album.svg');
+
   /// File path: assets/svg/icon_apple_login.svg
   SvgGenImage get iconAppleLogin =>
       const SvgGenImage('assets/svg/icon_apple_login.svg');
@@ -55,24 +58,50 @@ class $AssetsSvgGen {
   /// File path: assets/svg/icon_close.svg
   SvgGenImage get iconClose => const SvgGenImage('assets/svg/icon_close.svg');
 
+  /// File path: assets/svg/icon_filter.svg
+  SvgGenImage get iconFilter => const SvgGenImage('assets/svg/icon_filter.svg');
+
   /// File path: assets/svg/icon_kakao_login.svg
   SvgGenImage get iconKakaoLogin =>
       const SvgGenImage('assets/svg/icon_kakao_login.svg');
 
+  /// File path: assets/svg/icon_mic.svg
+  SvgGenImage get iconMic => const SvgGenImage('assets/svg/icon_mic.svg');
+
   /// File path: assets/svg/icon_nabi.svg
   SvgGenImage get iconNabi => const SvgGenImage('assets/svg/icon_nabi.svg');
+
+  /// File path: assets/svg/icon_nabi_filled.svg
+  SvgGenImage get iconNabiFilled =>
+      const SvgGenImage('assets/svg/icon_nabi_filled.svg');
+
+  /// File path: assets/svg/icon_play.svg
+  SvgGenImage get iconPlay => const SvgGenImage('assets/svg/icon_play.svg');
 
   /// File path: assets/svg/icon_profile.svg
   SvgGenImage get iconProfile =>
       const SvgGenImage('assets/svg/icon_profile.svg');
 
+  /// File path: assets/svg/icon_radio.svg
+  SvgGenImage get iconRadio => const SvgGenImage('assets/svg/icon_radio.svg');
+
+  /// File path: assets/svg/icon_reset.svg
+  SvgGenImage get iconReset => const SvgGenImage('assets/svg/icon_reset.svg');
+
   /// File path: assets/svg/icon_shuffle.svg
   SvgGenImage get iconShuffle =>
       const SvgGenImage('assets/svg/icon_shuffle.svg');
 
+  /// File path: assets/svg/icon_sort.svg
+  SvgGenImage get iconSort => const SvgGenImage('assets/svg/icon_sort.svg');
+
+  /// File path: assets/svg/icon_tag.svg
+  SvgGenImage get iconTag => const SvgGenImage('assets/svg/icon_tag.svg');
+
   /// List of all assets
   List<SvgGenImage> get values => [
         iconAdd,
+        iconAlbum,
         iconAppleLogin,
         iconArrowLeft,
         iconArrowRight,
@@ -83,10 +112,18 @@ class $AssetsSvgGen {
         iconCircleEmpty,
         iconClock,
         iconClose,
+        iconFilter,
         iconKakaoLogin,
+        iconMic,
         iconNabi,
+        iconNabiFilled,
+        iconPlay,
         iconProfile,
-        iconShuffle
+        iconRadio,
+        iconReset,
+        iconShuffle,
+        iconSort,
+        iconTag
       ];
 }
 

@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/data/notification/local_notification.dart';
+import 'package:nabi_app/presentaion/diary/diary_write_view.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/main/components/floating_menu_overlay_mixin.dart';
 import 'package:nabi_app/presentaion/main/components/main_view_components.dart';
 import 'package:nabi_app/user/auth_provider.dart';
+import 'package:nabi_app/utils/permission_request.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class MainView extends StatefulWidget {
@@ -32,18 +33,8 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   @override
   void initState() {
     super.initState();
-    _requestNotificationPermission();
+    requestNotificationPermission();
     initializeNotification();
-  }
-
-  Future<void> _requestNotificationPermission() async {
-    const permission = Permission.notification;
-    final isDenied = await permission.isDenied;
-    final isPermanentlyDenied = await permission.isPermanentlyDenied;
-
-    if (isDenied && !isPermanentlyDenied) {
-      Permission.notification.request();
-    }
   }
 
   @override
@@ -126,7 +117,10 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
             items: [
               MainPopupMenuItem(
                 title: "일기 쓰기",
-                onTap: () {},
+                onTap: () {
+                  hideOverlay();
+                  context.pushNamed(DiaryWriteView.name);
+                },
               ),
               MainPopupMenuItem(
                 title: "목표 추가",

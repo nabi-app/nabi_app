@@ -7,10 +7,8 @@ import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
 import 'package:nabi_app/presentaion/goal/nabi_custom_view.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
-import 'package:nabi_app/utils/ui/components/custom_scaffold.dart';
-import 'package:nabi_app/utils/ui/components/custom_text_field.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/components/nabi_calendar.dart';
-import 'package:nabi_app/utils/ui/components/outlined_border_action_button.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +22,6 @@ class GoalWriteView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScaffold(
       appBar: AppBar(
-        toolbarHeight: 70.w,
         actions: [
           _buildSaveButton(),
         ],
@@ -39,7 +36,7 @@ class GoalWriteView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 10.w),
+            SizedBox(height: 20.w),
             _buildTitleTextField(context),
             SizedBox(height: 30.w),
             _buildGoalDescriptionTextField(context),
@@ -90,7 +87,7 @@ class GoalWriteView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTitle("목표 설명"),
+        _buildTitle("나비 꿈틀임"),
         CustomTextField(
           hintText: "설명이 없어요. 설명을 입력해 추가해주세요.",
           onChanged: context.read<GoalWriteViewModel>().onDescriptionChanged,
@@ -103,7 +100,7 @@ class GoalWriteView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTitle("목표 기간"),
+        _buildTitle("나비 곁들임"),
         GestureDetector(
           onTap: () => showCalendarBottomSheet(
             context,
@@ -146,7 +143,7 @@ class GoalWriteView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTitle("알림 설정"),
+        _buildTitle("나비 속삭임"),
         GestureDetector(
           onTap: () => showModalBottomSheet<NotificationTime>(
               context: context,
@@ -512,6 +509,7 @@ class _TodoTextFieldState extends State<_TodoTextField> {
       hintStyle: baseTextField.copyWith(color: colorC6C8CF),
       contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.w),
       maxLines: 5,
+      maxLength: 30,
       onChanged: (value) => _value = value,
     );
   }

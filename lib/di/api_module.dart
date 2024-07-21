@@ -2,13 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+import 'package:nabi_app/data/source/diary_api.dart';
 import 'package:nabi_app/data/source/user_auth_api.dart';
 import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/repository/user_auth_repository.dart';
 import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/constants.dart';
-import 'package:nabi_app/utils/ui/components/toast_widget.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/logger.dart';
 import 'package:provider/provider.dart';
 
@@ -79,4 +80,7 @@ abstract class ApiModule {
 
   @lazySingleton
   UserAuthApi userApi() => UserAuthApi(dio, baseUrl: dotenv.get(domainUrlKey));
+
+  @lazySingleton
+  DiaryApi diaryApi() => DiaryApi(dio, baseUrl: dotenv.get(domainUrlKey));
 }

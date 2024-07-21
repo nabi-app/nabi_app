@@ -3,17 +3,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
-import 'package:nabi_app/utils/ui/components/complete_button.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class NabiCalendar extends StatefulWidget {
   final DateTime? selectedDay;
+  final DateTime? firstDay;
+  final DateTime? lastDay;
   final OnDaySelected onDaySelected;
 
   const NabiCalendar({
     super.key,
     required this.selectedDay,
+    required this.firstDay,
+    required this.lastDay,
     required this.onDaySelected,
   });
 
@@ -34,24 +38,29 @@ class _NabiCalendarState extends State<NabiCalendar> {
   Widget build(BuildContext context) {
     return TableCalendar(
       focusedDay: _focusedDay,
-      firstDay: DateTime(1999),
-      lastDay: DateTime(2040),
-      selectedDayPredicate: (date) => widget.selectedDay == null ? false : date.compareTo(widget.selectedDay!) == 0,
+      firstDay: widget.firstDay ?? DateTime(1900),
+      lastDay: widget.lastDay ?? DateTime(2100),
+      selectedDayPredicate: (date) => widget.selectedDay == null
+          ? false
+          : date.year == widget.selectedDay!.year &&
+              date.month == widget.selectedDay!.month &&
+              date.day == widget.selectedDay!.day,
       onDaySelected: widget.onDaySelected,
       locale: "ko_KR",
       availableGestures: AvailableGestures.horizontalSwipe,
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarBuilders: CalendarBuilders(
-          headerTitleBuilder: _headerTitleBuilder,
-          dowBuilder: _dowBuilder,
-          outsideBuilder: (_, __, ___) => const SizedBox.shrink(),
-          defaultBuilder: _defaultBuilder,
-          selectedBuilder: _selectedBuilder,
-          todayBuilder: _defaultBuilder,
-          disabledBuilder: _defaultBuilder),
+        headerTitleBuilder: _headerTitleBuilder,
+        dowBuilder: _dowBuilder,
+        outsideBuilder: (_, __, ___) => const SizedBox.shrink(),
+        defaultBuilder: _defaultBuilder,
+        selectedBuilder: _selectedBuilder,
+        todayBuilder: _defaultBuilder,
+        disabledBuilder: _defaultBuilder,
+      ),
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
-        headerPadding: EdgeInsets.only(bottom: 32.w),
+        headerPadding: EdgeInsets.only(bottom: 30.w),
         leftChevronVisible: false,
         rightChevronVisible: false,
       ),
@@ -194,11 +203,15 @@ class _NabiCalendarState extends State<NabiCalendar> {
 class NabiCalendarBottomSheet extends StatefulWidget {
   final String? title;
   final DateTime? selectedDay;
+  final DateTime? firstDay;
+  final DateTime? lastDay;
 
   const NabiCalendarBottomSheet({
     super.key,
     this.title,
     required this.selectedDay,
+    required this.firstDay,
+    required this.lastDay,
   });
 
   @override
@@ -218,45 +231,16 @@ class _NabiCalendarBottomSheetState extends State<NabiCalendarBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: SafeArea(
-        minimum: EdgeInsets.only(bottom: 20.w),
-        child: Column(
-          children: [
-            _buildBar(),
-            _buildTitle(),
-            SizedBox(height: 30.w),
-            _buildCalendar(),
-            SizedBox(height: 20.w),
-            _buildCompleteButton(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBar() {
-    return Container(
-      width: 40.w,
-      height: 4.w,
-      margin: EdgeInsets.only(top: 12.w, bottom: 22.w),
-      decoration: BoxDecoration(
-        color: color999DAC,
-        borderRadius: BorderRadius.circular(100),
-      ),
-    );
-  }
-
-  Widget _buildTitle() {
-    return Text(
-      widget.title ?? "날짜 설정",
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
-        fontSize: 16.sp,
-        height: 1,
-        leadingDistribution: TextLeadingDistribution.even,
-        letterSpacing: -0.48,
+    return BottomSheetFrame(
+      title: widget.title ?? "날짜 설정",
+      completeButtonText: "설정완료",
+      onComplete: !_isDaySelected ? null : () => context.pop(_selectedDay),
+      child: Column(
+        children: [
+          SizedBox(height: 30.w),
+          _buildCalendar(),
+          SizedBox(height: 20.w),
+        ],
       ),
     );
   }
@@ -266,17 +250,13 @@ class _NabiCalendarBottomSheetState extends State<NabiCalendarBottomSheet> {
       padding: EdgeInsets.symmetric(horizontal: 25.w),
       child: NabiCalendar(
         selectedDay: _selectedDay,
+        firstDay: widget.firstDay,
+        lastDay: widget.lastDay,
         onDaySelected: (selectedDay, focusedDay) {
           _selectedDay = selectedDay;
           setState(() {});
         },
       ),
-    );
-  }
-
-  Widget _buildCompleteButton(BuildContext context) {
-    return CompleteButton(
-      onTap: !_isDaySelected ? null : () => context.pop(_selectedDay),
     );
   }
 }
@@ -285,6 +265,8 @@ Future<DateTime?> showCalendarBottomSheet(
   BuildContext context, {
   String? title,
   required DateTime? selectedDay,
+  DateTime? firstDay,
+  DateTime? lastDay,
 }) {
   return showModalBottomSheet<DateTime>(
     context: context,
@@ -293,6 +275,8 @@ Future<DateTime?> showCalendarBottomSheet(
     builder: (_) => NabiCalendarBottomSheet(
       title: title,
       selectedDay: selectedDay,
+      firstDay: firstDay,
+      lastDay: lastDay,
     ),
   );
 }
