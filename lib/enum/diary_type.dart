@@ -1,0 +1,4 @@
+enum DiaryListOrderType {
+  asc,
+  desc,
+}

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
@@ -9,9 +8,9 @@ import 'package:nabi_app/domain/repository/user_auth_repository.dart';
 import 'package:nabi_app/enum/sign_up_term_type.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/router/router_config.dart';
-import 'package:nabi_app/utils/ui/components/toast_widget.dart';
 import 'package:nabi_app/user/auth_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:nabi_app/utils/permission_request.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -97,20 +96,9 @@ class SignUpViewModel extends ChangeNotifier {
 
   Future<void> pickProfileImage() async {
     try {
-      if (Platform.isAndroid) {
-        final androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
-        final androidSdkVersion = androidDeviceInfo.version.sdkInt;
-        final permission = androidSdkVersion < 33 ? Permission.storage : Permission.photos;
-        final isGranted = await permission.isGranted;
+      final isPermissionGranted = await requestPhotoPermission();
 
-        if (!isGranted) {
-          final permissionStatus = await permission.request();
-
-          if (!permissionStatus.isGranted) {
-            // 토스트
-          }
-        }
-      }
+      if (!isPermissionGranted) return;
 
       final image = await ImagePicker().pickImage(
         source: ImageSource.gallery,

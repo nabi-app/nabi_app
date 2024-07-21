@@ -3,9 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nabi_app/presentaion/goal/nabi_custom_view_model.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
-import 'package:nabi_app/utils/ui/components/custom_scaffold.dart';
-import 'package:nabi_app/utils/ui/components/custom_text_field.dart';
-import 'package:nabi_app/utils/ui/components/outlined_border_action_button.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 

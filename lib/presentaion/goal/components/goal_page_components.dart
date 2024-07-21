@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/enum/notification_time_type.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
-import 'package:nabi_app/utils/ui/components/complete_button.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -261,37 +261,29 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(
-          left: 30.w,
-          right: 30.w,
-          bottom: MediaQuery.of(context).padding.bottom + 20.w,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildBar(),
-            _buildTitle(),
-            SizedBox(height: 30.w),
-            Row(
+    return BottomSheetFrame(
+      title: "알림 시간 설정",
+      completeButtonText: "설정완료",
+      onComplete: (_timeType == null || _hour == null || _minute == null) ? null : () => context.pop(_calculateTime()),
+      child: Column(
+        children: [
+          SizedBox(height: 30.w),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            child: Row(
               children: [
                 _buildTimeTypeButton(NotificationTimeType.morning),
                 SizedBox(width: 10.w),
                 _buildTimeTypeButton(NotificationTimeType.afternoon),
               ],
             ),
-            SizedBox(height: 30.w),
-            _buildTimeTitle("몇시로 설정할까요?"),
-            SizedBox(height: 14.w),
-            Wrap(
+          ),
+          SizedBox(height: 30.w),
+          _buildTimeTitle("몇시로 설정할까요?"),
+          SizedBox(height: 14.w),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            child: Wrap(
               spacing: 10.w,
               runSpacing: 14.w,
               children: hours
@@ -304,10 +296,13 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
                   )
                   .toList(),
             ),
-            SizedBox(height: 30.w),
-            _buildTimeTitle("몇분으로 할까요?"),
-            SizedBox(height: 14.w),
-            Wrap(
+          ),
+          SizedBox(height: 30.w),
+          _buildTimeTitle("몇분으로 할까요?"),
+          SizedBox(height: 14.w),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            child: Wrap(
               spacing: 10.w,
               runSpacing: 14.w,
               children: minutes
@@ -320,39 +315,9 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
                   )
                   .toList(),
             ),
-            SizedBox(height: 30.w),
-            CompleteButton(
-              margin: EdgeInsets.zero,
-              onTap: (_timeType == null || _hour == null || _minute == null) ? null : () => context.pop(_calculateTime()),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBar() {
-    return Container(
-      height: 4.w,
-      width: 40.w,
-      margin: EdgeInsets.only(top: 12.w, bottom: 22.w),
-      decoration: BoxDecoration(
-        color: color999DAC,
-        borderRadius: BorderRadius.circular(100),
-      ),
-    );
-  }
-
-  Widget _buildTitle() {
-    return Text(
-      "알림 시간 설정",
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
-        fontSize: 16.sp,
-        height: 1,
-        leadingDistribution: TextLeadingDistribution.even,
-        letterSpacing: -0.48.sp,
+          ),
+          SizedBox(height: 30.w),
+        ],
       ),
     );
   }
@@ -385,7 +350,8 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
   }
 
   Widget _buildTimeTitle(String text) {
-    return Align(
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 30.w),
       alignment: Alignment.centerLeft,
       child: Text(
         text,

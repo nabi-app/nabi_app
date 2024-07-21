@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
+import 'package:nabi_app/presentaion/diary/diary_page_view_model.dart';
+import 'package:nabi_app/presentaion/diary/diary_write_image_detail_view.dart';
+import 'package:nabi_app/presentaion/diary/diary_write_view.dart';
+import 'package:nabi_app/presentaion/diary/diary_write_view_model.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
 import 'package:nabi_app/presentaion/goal/goal_page.dart';
@@ -57,6 +63,7 @@ final GoRouter routerConfig = GoRouter(
       builder: (_, __) => const SignUpCompleteView(),
     ),
     StatefulShellRoute.indexedStack(
+      builder: (_, __, navigationShell) => MainView(navigationShell: navigationShell),
       branches: [
         StatefulShellBranch(
           routes: [
@@ -74,16 +81,16 @@ final GoRouter routerConfig = GoRouter(
             GoRoute(
               path: DiaryPage.path,
               name: DiaryPage.name,
-              pageBuilder: (_, __) => const NoTransitionPage(
-                child: DiaryPage(),
+              pageBuilder: (_, __) => NoTransitionPage(
+                child: ChangeNotifierProvider(
+                  create: (_) => getIt<DiaryPageViewModel>(),
+                  builder: (_, __) => const DiaryPage(),
+                ),
               ),
             ),
           ],
         ),
       ],
-      builder: (_, __, navigationShell) => MainView(
-        navigationShell: navigationShell,
-      ),
     ),
     GoRoute(
       path: GoalWriteView.path,
@@ -101,6 +108,20 @@ final GoRouter routerConfig = GoRouter(
         builder: (_, __) => const NabiCustomView(),
       ),
     ),
+    GoRoute(
+        path: DiaryWriteView.path,
+        name: DiaryWriteView.name,
+        builder: (_, __) => ChangeNotifierProvider(
+              create: (_) => getIt<DiaryWriteViewModel>(),
+              builder: (_, __) => const DiaryWriteView(),
+            ),
+        routes: [
+          GoRoute(
+            path: DiaryWriteImageDetailView.path,
+            name: DiaryWriteImageDetailView.name,
+            builder: (_, state) => DiaryWriteImageDetailView(args: state.extra as ({List<File> images, int index})),
+          ),
+        ]),
   ],
   refreshListenable: getIt<AuthProvider>(),
   redirect: getIt<AuthProvider>().redirection,
