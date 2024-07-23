@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:nabi_app/presentaion/diary/diary_write_image_detail_view.dart';
 import 'package:nabi_app/presentaion/diary/diary_write_view_model.dart';
 import 'package:nabi_app/utils/permission_request.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
@@ -141,17 +138,26 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
   Widget _buildRecordPlayer() {
     return Selector<DiaryWriteViewModel, File?>(
       selector: (_, viewModel) => viewModel.recordFile,
-      builder: (_, file, __) => file == null
+      builder: (context, file, __) => file == null
           ? const SizedBox.shrink()
-          : _RecordPlayer(
+          : RecordPlayer(
               playerController: _playerController,
               file: file,
+              onDeleteTap: context.read<DiaryWriteViewModel>().deleteRecordFile,
             ),
     );
   }
 
   Widget _buildImages() {
-    return const _ImageCarouselSlider();
+    return Selector<DiaryWriteViewModel, List<File>>(
+      selector: (_, viewModel) => viewModel.images,
+      builder: (context, images, __) => images.isEmpty
+          ? const SizedBox.shrink()
+          : ImageCarouselSlider(
+              images: images,
+              removeImage: context.read<DiaryWriteViewModel>().removeImage,
+            ),
+    );
   }
 
   Widget _buildTextField(BuildContext context) {
@@ -338,335 +344,5 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
     );
 
     viewModel.onHashTagsChanged(result);
-  }
-}
-
-class _RecordPlayer extends StatefulWidget {
-  final PlayerController playerController;
-  final File file;
-
-  const _RecordPlayer({
-    required this.playerController,
-    required this.file,
-  });
-
-  @override
-  State<_RecordPlayer> createState() => _RecordPlayerState();
-}
-
-class _RecordPlayerState extends State<_RecordPlayer> {
-  late final PlayerController _playerController = widget.playerController;
-  late StreamSubscription _playerCompletionSubscription;
-  late StreamSubscription<int> _playerDurationSubscription;
-  List<double>? _waveFormData;
-  bool _isLoading = true;
-  int _playerTimeSeconds = 0;
-  int _playerRemainSeconds = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _initPlayer();
-
-    _playerDurationSubscription = _playerController.onCurrentDurationChanged.listen(
-      (duration) {
-        _playerRemainSeconds = _playerTimeSeconds - duration;
-        setState(() {});
-      },
-    );
-
-    _playerCompletionSubscription = _playerController.onCompletion.listen(
-      (_) async {
-        await _playerController.stopPlayer();
-        await _playerController.preparePlayer(path: widget.file.path);
-        _playerRemainSeconds = _playerTimeSeconds;
-        setState(() {});
-      },
-    );
-  }
-
-  Future<void> _initPlayer() async {
-    _isLoading = true;
-    setState(() {});
-
-    await _playerController.preparePlayer(path: widget.file.path, noOfSamples: 17);
-    _waveFormData = _playerController.waveformData;
-    _playerTimeSeconds = _playerController.maxDuration;
-    _playerRemainSeconds = _playerController.maxDuration;
-
-    _isLoading = false;
-    setState(() {});
-  }
-
-  @override
-  void didUpdateWidget(covariant _RecordPlayer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.file.hashCode != widget.file.hashCode) {
-      _initPlayer();
-    }
-  }
-
-  @override
-  void dispose() {
-    _playerDurationSubscription.cancel();
-    _playerCompletionSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) return const SizedBox.shrink();
-
-    return Padding(
-      padding: EdgeInsets.only(top: 10.w, left: 16.w, right: 16.w),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _buildAudioWaveForms(),
-          _buildAudioDurationText(),
-          _buildPlayButton(),
-          _buildDeleteButton(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAudioWaveForms() {
-    return AudioFileWaveforms(
-      size: Size(343.w, 68.w),
-      padding: EdgeInsets.only(
-        left: 47.w,
-        top: 10.w,
-        bottom: 10.w,
-      ),
-      decoration: BoxDecoration(
-        color: colorE5EAF7,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      playerController: _playerController,
-      waveformData: _waveFormData ?? [],
-      waveformType: WaveformType.fitWidth,
-      playerWaveStyle: PlayerWaveStyle(
-        fixedWaveColor: colorC5CFF2,
-        liveWaveColor: Colors.blueAccent,
-        spacing: 13.5.w,
-        waveThickness: 6.w,
-        scaleFactor: 300,
-      ),
-    );
-  }
-
-  Widget _buildAudioDurationText() {
-    final toSeconds = _playerRemainSeconds ~/ 1000;
-    final minutes = toSeconds ~/ 60;
-    final seconds = toSeconds - (minutes * 60);
-
-    return Positioned(
-      right: 12.w,
-      child: Text(
-        "${minutes.toString().padLeft(2, "0")}:${seconds.toString().padLeft(2, "0")}",
-        style: TextStyle(
-          color: color999DAC,
-          fontWeight: FontWeight.w400,
-          fontSize: 14.sp,
-          height: 1,
-          leadingDistribution: TextLeadingDistribution.even,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlayButton() {
-    if (_playerController.playerState.isPlaying) return const SizedBox.shrink();
-
-    return GestureDetector(
-      onTap: () async {
-        await _playerController.startPlayer();
-        setState(() {});
-      },
-      child: Container(
-        width: 50.w,
-        height: 34.w,
-        padding: EdgeInsets.only(left: 20.w, right: 12.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Assets.svg.iconPlay.svg(
-          width: 18.w,
-          height: 18.w,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDeleteButton(BuildContext context) {
-    return Positioned(
-      top: 10.w,
-      right: 10.w,
-      child: GestureDetector(
-        onTap: () async {
-          final viewModel = context.read<DiaryWriteViewModel>();
-          await _playerController.stopPlayer();
-          viewModel.deleteRecordFile();
-        },
-        child: Container(
-          width: 18.w,
-          height: 18.w,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Assets.svg.iconClose.svg(
-            width: 8.w,
-            height: 8.w,
-            colorFilter: const ColorFilter.mode(
-              Colors.black,
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ImageCarouselSlider extends StatefulWidget {
-  const _ImageCarouselSlider();
-
-  @override
-  State<_ImageCarouselSlider> createState() => _ImageCarouselSliderState();
-}
-
-class _ImageCarouselSliderState extends State<_ImageCarouselSlider> {
-  int _page = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<DiaryWriteViewModel, List<File>>(
-      selector: (_, viewModel) => viewModel.images,
-      builder: (_, images, __) => images.isEmpty
-          ? const SizedBox.shrink()
-          : Container(
-              margin: EdgeInsets.only(top: 10.w, left: 16.w, right: 16.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: colorF6F6F6,
-              ),
-              child: Stack(
-                children: [
-                  _buildImageSlider(images),
-                  _buildCloseButton(),
-                  _buildPageIndicator(images.length),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _buildImageSlider(List<File> images) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: CarouselSlider.builder(
-        itemCount: images.length,
-        options: CarouselOptions(
-          viewportFraction: 1,
-          aspectRatio: 1.9056,
-          enableInfiniteScroll: false,
-          onPageChanged: (page, _) {
-            _page = page + 1;
-            setState(() {});
-          },
-        ),
-        itemBuilder: (_, index, __) => _buildImage(
-          images: images,
-          index: index,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImage({
-    required List<File> images,
-    required int index,
-  }) {
-    return GestureDetector(
-      onTap: () => context.pushNamed(
-        DiaryWriteImageDetailView.name,
-        extra: (images: images, index: index),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: FileImage(images[index]),
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCloseButton() {
-    return Positioned(
-      top: 12.w,
-      right: 12.w,
-      child: GestureDetector(
-        onTap: () {
-          final viewModel = context.read<DiaryWriteViewModel>();
-
-          viewModel.removeImage(_page - 1);
-
-          if (viewModel.images.isEmpty) return;
-
-          if (viewModel.images.length >= _page) return;
-
-          _page -= 1;
-        },
-        child: Container(
-          width: 18.w,
-          height: 18.w,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Assets.svg.iconClose.svg(
-            width: 8.w,
-            height: 8.w,
-            colorFilter: const ColorFilter.mode(
-              Colors.black,
-              BlendMode.srcIn,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPageIndicator(int itemCount) {
-    return Positioned(
-      left: 12.w,
-      bottom: 12.w,
-      child: Container(
-        width: 39.w,
-        height: 22.w,
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(100),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          "$_page/$itemCount",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-            fontSize: 12.sp,
-            height: 1,
-            leadingDistribution: TextLeadingDistribution.even,
-          ),
-        ),
-      ),
-    );
   }
 }

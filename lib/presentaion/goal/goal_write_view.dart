@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nabi_app/domain/model/todo_item_model.dart';
 import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
+import 'package:nabi_app/presentaion/goal/components/goal_write_components.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view_model.dart';
 import 'package:nabi_app/presentaion/goal/nabi_custom_view.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';

@@ -1,9 +1,162 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:nabi_app/domain/model/diary_list_response.dart';
+import 'package:nabi_app/enum/diary_type.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
+
+class DiaryItemCard extends StatelessWidget {
+  final DiaryItemData item;
+  final VoidCallback onTap;
+
+  const DiaryItemCard({
+    super.key,
+    required this.item,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(14.w, 14.w, 14.w, 20.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: const Offset(0, 0),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildRepresentaionImage(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildDate(),
+              _buildHashTagList(),
+            ],
+          ),
+          Container(
+            height: 1,
+            margin: EdgeInsets.only(top: 9.w),
+            color: colorE4E7ED,
+          ),
+          SizedBox(height: 20.w),
+          _buildContent(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRepresentaionImage() {
+    if (item.images?.isEmpty ?? true) return const SizedBox.shrink();
+
+    return Container(
+      height: 168.w,
+      margin: EdgeInsets.only(bottom: 14.w),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          image: DecorationImage(image: NetworkImage(item.images!.first), fit: BoxFit.cover)),
+    );
+  }
+
+  Widget _buildDate() {
+    return Text(
+      DateFormat("yyyy년 M월 d일 E요일", "ko_KR").format(item.date),
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w700,
+        fontSize: 16.sp,
+        height: 1.25,
+        leadingDistribution: TextLeadingDistribution.even,
+      ),
+    );
+  }
+
+  Widget _buildHashTagList() {
+    return Row(
+      children: [
+        if (item.images?.isNotEmpty ?? false) ...[
+          _buildHashTag(
+            Assets.svg.iconAlbum.svg(
+              width: 14.w,
+              height: 14.w,
+              colorFilter: const ColorFilter.mode(
+                color999DAC,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+          SizedBox(width: 6.w),
+        ],
+        if (item.records?.isNotEmpty ?? false) ...[
+          _buildHashTag(
+            Assets.svg.iconMic.svg(
+              width: 14.w,
+              height: 14.w,
+              colorFilter: const ColorFilter.mode(
+                color999DAC,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+          SizedBox(width: 6.w),
+        ],
+        if (item.tags?.isNotEmpty ?? false)
+          _buildHashTag(
+            Assets.svg.iconTag.svg(
+              width: 14.w,
+              height: 14.w,
+              colorFilter: const ColorFilter.mode(
+                color999DAC,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildHashTag(Widget icon) {
+    return Container(
+      width: 20.w,
+      height: 20.w,
+      decoration: BoxDecoration(
+        color: colorF1F2F7,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: icon,
+    );
+  }
+
+  Widget _buildContent() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        item.description,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w400,
+          fontSize: 16.sp,
+          height: 1,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
+      ),
+    );
+  }
+}
 
 class DiaryFilterButton extends StatelessWidget {
   final Widget? icon;
@@ -15,7 +168,7 @@ class DiaryFilterButton extends StatelessWidget {
     super.key,
     this.icon,
     this.text,
-    required this.selected,
+    this.selected = true,
     this.onTap,
   }) : assert(icon == null || text == null, "icon 또는 text 둘중 하나는 제공되어야 합니다.");
 
@@ -69,6 +222,7 @@ class DiaryRadioButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onSelect,
+      behavior: HitTestBehavior.translucent,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),
         child: Row(
@@ -97,25 +251,48 @@ class DiaryRadioButton extends StatelessWidget {
 }
 
 class DiaryFilterBottomSheet extends StatefulWidget {
-  const DiaryFilterBottomSheet({super.key});
+  final bool isTagFilterSelected;
+  final bool isImageFilterSelected;
+  final bool isRecordFilterSelected;
+  final int? filterMonth;
+  final DiaryListOrderType orderType;
+
+  const DiaryFilterBottomSheet({
+    super.key,
+    required this.isTagFilterSelected,
+    required this.isImageFilterSelected,
+    required this.isRecordFilterSelected,
+    required this.filterMonth,
+    required this.orderType,
+  });
 
   @override
   State<DiaryFilterBottomSheet> createState() => _DiaryFilterBottomSheetState();
 }
 
 class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
-  List<int> get _monthList => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  final List<int> _monthList = const [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  late bool _isTagFilterSelected;
+  late bool _isImageFilterSelected;
+  late bool _isRecordFilterSelected;
+  late int? _filterMonth;
+  late DiaryListOrderType _orderType;
 
   @override
   void initState() {
     super.initState();
+    _isTagFilterSelected = widget.isTagFilterSelected;
+    _isImageFilterSelected = widget.isImageFilterSelected;
+    _isRecordFilterSelected = widget.isRecordFilterSelected;
+    _filterMonth = widget.filterMonth;
+    _orderType = widget.orderType;
   }
 
   @override
   Widget build(BuildContext context) {
     return BottomSheetFrame(
       title: "필터 설정하기",
-      maxHeightRatio: 0.8374,
+      height: 646.w,
       bottomWidget: _buildBottomButtons(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -126,7 +303,7 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
           _buildMonthArea(),
           SizedBox(height: 40.w),
           _buildSortArea(),
-          SizedBox(height: 75.w),
+          SizedBox(height: 80.w),
         ],
       ),
     );
@@ -174,20 +351,20 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
         SizedBox(height: 24.w),
         DiaryRadioButton(
           text: "태그",
-          selected: true,
-          onSelect: () {},
+          selected: _isTagFilterSelected,
+          onSelect: () => setState(() => _isTagFilterSelected = !_isTagFilterSelected),
         ),
         SizedBox(height: 24.w),
         DiaryRadioButton(
           text: "이미지",
-          selected: true,
-          onSelect: () {},
+          selected: _isImageFilterSelected,
+          onSelect: () => setState(() => _isImageFilterSelected = !_isImageFilterSelected),
         ),
         SizedBox(height: 24.w),
         DiaryRadioButton(
           text: "녹음",
-          selected: true,
-          onSelect: () {},
+          selected: _isRecordFilterSelected,
+          onSelect: () => setState(() => _isRecordFilterSelected = !_isRecordFilterSelected),
         ),
       ],
     );
@@ -208,7 +385,15 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
                 .map(
                   (month) => DiaryFilterButton(
                     text: "$month월",
-                    selected: true,
+                    selected: _filterMonth == month,
+                    onTap: () {
+                      if (_filterMonth == month) {
+                        _filterMonth = null;
+                      } else {
+                        _filterMonth = month;
+                      }
+                      setState(() {});
+                    },
                   ),
                 )
                 .toList(),
@@ -225,15 +410,15 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
         _title("정렬기준"),
         SizedBox(height: 24.w),
         DiaryRadioButton(
-          text: "최신순",
-          selected: true,
-          onSelect: () {},
+          text: DiaryListOrderType.asc.text,
+          selected: _orderType == DiaryListOrderType.asc,
+          onSelect: () => setState(() => _orderType = DiaryListOrderType.asc),
         ),
         SizedBox(height: 24.w),
         DiaryRadioButton(
-          text: "오래된 순",
-          selected: true,
-          onSelect: () {},
+          text: DiaryListOrderType.desc.text,
+          selected: _orderType == DiaryListOrderType.desc,
+          onSelect: () => setState(() => _orderType = DiaryListOrderType.desc),
         ),
       ],
     );
@@ -241,7 +426,12 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
 
   Widget _buildBottomButtons() {
     return Container(
-      padding: EdgeInsets.only(top: 10.w, left: 30.w, right: 30.w),
+      padding: EdgeInsets.only(
+        top: 10.w,
+        left: 30.w,
+        right: 30.w,
+        bottom: 6.w,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: colorEBEDF5)),
@@ -253,7 +443,7 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
           Expanded(
             child: CompleteButton(
               margin: EdgeInsets.zero,
-              onTap: () {},
+              onTap: _onComplete,
             ),
           ),
         ],
@@ -263,7 +453,7 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
 
   Widget _buildResetButton() {
     return GestureDetector(
-      onTap: () {},
+      onTap: _reset,
       child: Row(
         children: [
           Assets.svg.iconReset.svg(
@@ -284,22 +474,65 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
       ),
     );
   }
+
+  void _reset() {
+    _isTagFilterSelected = false;
+    _isImageFilterSelected = false;
+    _isRecordFilterSelected = false;
+    _filterMonth = null;
+    _orderType = DiaryListOrderType.asc;
+    setState(() {});
+  }
+
+  void _onComplete() {
+    if (_isTagFilterSelected == widget.isTagFilterSelected &&
+        _isImageFilterSelected == widget.isImageFilterSelected &&
+        _isRecordFilterSelected == widget.isRecordFilterSelected &&
+        _filterMonth == widget.filterMonth &&
+        _orderType == widget.orderType) {
+      context.pop();
+      return;
+    }
+
+    context.pop(
+      (
+        isTagFilterSelected: _isTagFilterSelected,
+        isImageFilterSelected: _isImageFilterSelected,
+        isRecordFilterSelected: _isRecordFilterSelected,
+        filterMonth: _filterMonth,
+        orderType: _orderType,
+      ),
+    );
+  }
 }
 
 class DiarySortBottomSheet extends StatefulWidget {
-  const DiarySortBottomSheet({super.key});
+  final DiaryListOrderType orderType;
+
+  const DiarySortBottomSheet({
+    super.key,
+    required this.orderType,
+  });
 
   @override
   State<DiarySortBottomSheet> createState() => _DiarySortBottomSheetState();
 }
 
 class _DiarySortBottomSheetState extends State<DiarySortBottomSheet> {
+  late DiaryListOrderType _orderType;
+
+  @override
+  void initState() {
+    super.initState();
+    _orderType = widget.orderType;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BottomSheetFrame(
       title: "정렬 설정하기",
-      maxHeightRatio: 0.4187,
-      onComplete: () {},
+      height: 306.w,
+      onComplete: () => context.pop(_orderType),
       completeButtonText: "설정완료",
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -320,18 +553,20 @@ class _DiarySortBottomSheetState extends State<DiarySortBottomSheet> {
           ),
           SizedBox(height: 24.w),
           DiaryRadioButton(
-            text: "최신순",
-            selected: true,
-            onSelect: () {},
+            text: DiaryListOrderType.asc.text,
+            selected: _orderType == DiaryListOrderType.asc,
+            onSelect: () => _onSelect(DiaryListOrderType.asc),
           ),
           SizedBox(height: 24.w),
           DiaryRadioButton(
-            text: "오래된 순",
-            selected: false,
-            onSelect: () {},
+            text: DiaryListOrderType.desc.text,
+            selected: _orderType == DiaryListOrderType.desc,
+            onSelect: () => _onSelect(DiaryListOrderType.desc),
           ),
         ],
       ),
     );
   }
+
+  void _onSelect(DiaryListOrderType orderType) => setState(() => _orderType = orderType);
 }

@@ -281,8 +281,7 @@ class BottomSheetFrame extends StatelessWidget {
   final String? title;
   final String? completeButtonText;
   final VoidCallback? onComplete;
-  final EdgeInsetsGeometry padding;
-  final double maxHeightRatio;
+  final double? height;
   final Widget? bottomWidget;
 
   const BottomSheetFrame({
@@ -291,35 +290,32 @@ class BottomSheetFrame extends StatelessWidget {
     this.title,
     this.completeButtonText,
     this.onComplete,
-    this.padding = EdgeInsets.zero,
-    this.maxHeightRatio = 0.6749,
+    this.height,
     this.bottomWidget,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * maxHeightRatio,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
-        child: SafeArea(
-          minimum: EdgeInsets.only(bottom: 20.w),
+      ),
+      child: SafeArea(
+        minimum: EdgeInsets.only(bottom: 16.w),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: height ?? 514.w),
           child: Stack(
+            alignment: Alignment.center,
             children: [
               Column(
                 children: [
                   _buildBar(),
-                  Expanded(
+                  Flexible(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
@@ -329,16 +325,9 @@ class BottomSheetFrame extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _buildCompleteButton(),
                 ],
               ),
-              if (bottomWidget != null)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: bottomWidget!,
-                ),
+              _buildBottomWidget(),
             ],
           ),
         ),
@@ -374,12 +363,30 @@ class BottomSheetFrame extends StatelessWidget {
     );
   }
 
-  Widget _buildCompleteButton() {
+  Widget _buildBottomWidget() {
+    if (bottomWidget != null) {
+      return Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: bottomWidget!,
+      );
+    }
+
     if (completeButtonText == null) return const SizedBox.shrink();
 
-    return CompleteButton(
-      text: completeButtonText!,
-      onTap: onComplete,
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.only(top: 16.w),
+        child: CompleteButton(
+          text: completeButtonText!,
+          onTap: onComplete,
+        ),
+      ),
     );
   }
 }

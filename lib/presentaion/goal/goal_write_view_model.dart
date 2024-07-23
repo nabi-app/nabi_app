@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:nabi_app/domain/model/todo_item_model.dart';
 import 'package:nabi_app/enum/notification_time_type.dart';
-import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
+import 'package:nabi_app/presentaion/goal/components/goal_write_components.dart';
 
 @injectable
 class GoalWriteViewModel extends ChangeNotifier {
