@@ -11,8 +11,8 @@ class DiaryListRequest with _$DiaryListRequest {
     required int page,
     @Default(10) int take,
     @JsonKey(name: "filter_month") int? filterMonth,
-    @Default(false) @JsonKey(name: "filter_tag") bool filterTag,
-    @Default(false) @JsonKey(name: "filter_image") bool filterImage,
+    @Default(false) @JsonKey(name: "filter_tags") bool filterTags,
+    @Default(false) @JsonKey(name: "filter_images") bool filterImages,
     @Default(false) @JsonKey(name: "filter_records") bool filterRecords,
   }) = _DiaryListRequest;
 

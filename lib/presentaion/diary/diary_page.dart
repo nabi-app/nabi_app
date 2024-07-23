@@ -1,27 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:nabi_app/domain/model/diary_list_response.dart';
+import 'package:nabi_app/enum/diary_type.dart';
 import 'package:nabi_app/presentaion/diary/components/diary_components.dart';
 import 'package:nabi_app/presentaion/diary/diary_page_view_model.dart';
 import 'package:nabi_app/router/router_config.dart';
+import 'package:nabi_app/utils/throttle.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 
-class DiaryPage extends StatelessWidget {
+class DiaryPage extends StatefulWidget {
   const DiaryPage({super.key});
 
   static const String path = "/diary";
   static const String name = "DiaryPage";
 
   @override
+  State<DiaryPage> createState() => _DiaryPageState();
+}
+
+class _DiaryPageState extends State<DiaryPage> {
+  final ScrollController _scrollController = ScrollController();
+  final Throttle _throttle = Throttle(duration: const Duration(milliseconds: 1500));
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollCallback);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _throttle.dispose();
+    super.dispose();
+  }
+
+  void _scrollCallback() {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent) {
+      _throttle.run(context.read<DiaryPageViewModel>().fetch);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildFilterButtons(context),
-        _buildSortButton(context),
+        _buildFilterButtons(),
+        _buildSortButton(),
         Expanded(
           child: _buildDiaryList(),
         ),
@@ -29,7 +57,7 @@ class DiaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterButtons(BuildContext context) {
+  Widget _buildFilterButtons() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.w),
       child: Wrap(
@@ -39,59 +67,73 @@ class DiaryPage extends StatelessWidget {
         children: [
           DiaryFilterButton(
             icon: Assets.svg.iconFilter.svg(width: 20.w, height: 20.w),
-            selected: true,
             onTap: () => _onFilterTap(context),
           ),
-          DiaryFilterButton(
-            text: "태그",
-            selected: true,
-            onTap: () => _onFilterTap(context),
+          Selector<DiaryPageViewModel, bool>(
+            selector: (_, viewModel) => viewModel.isTagFilterSelected,
+            builder: (_, isTagFilterSelected, __) => DiaryFilterButton(
+              text: "태그",
+              selected: isTagFilterSelected,
+              onTap: () => _onFilterTap(context),
+            ),
           ),
-          DiaryFilterButton(
-            text: "이미지",
-            selected: true,
-            onTap: () => _onFilterTap(context),
+          Selector<DiaryPageViewModel, bool>(
+            selector: (_, viewModel) => viewModel.isImageFilterSelected,
+            builder: (_, isImageFilterSelected, __) => DiaryFilterButton(
+              text: "이미지",
+              selected: isImageFilterSelected,
+              onTap: () => _onFilterTap(context),
+            ),
           ),
-          DiaryFilterButton(
-            text: "녹음",
-            selected: false,
-            onTap: () => _onFilterTap(context),
+          Selector<DiaryPageViewModel, bool>(
+            selector: (_, viewModel) => viewModel.isRecordFilterSelected,
+            builder: (_, isRecordFilterSelected, __) => DiaryFilterButton(
+              text: "녹음",
+              selected: isRecordFilterSelected,
+              onTap: () => _onFilterTap(context),
+            ),
           ),
-          DiaryFilterButton(
-            text: "월별",
-            selected: false,
-            onTap: () => _onFilterTap(context),
+          Selector<DiaryPageViewModel, int?>(
+            selector: (_, viewModel) => viewModel.filterMonth,
+            builder: (_, filterMonth, __) => DiaryFilterButton(
+              text: "월별",
+              selected: filterMonth != null,
+              onTap: () => _onFilterTap(context),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSortButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _onSortTap(context),
-      behavior: HitTestBehavior.translucent,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.w),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              "최신순",
-              style: TextStyle(
-                color: color233067,
-                fontWeight: FontWeight.w500,
-                fontSize: 14.sp,
-                height: 1,
-                leadingDistribution: TextLeadingDistribution.even,
+  Widget _buildSortButton() {
+    return Selector<DiaryPageViewModel, DiaryListOrderType>(
+      selector: (_, viewModel) => viewModel.orderType,
+      builder: (context, orderType, __) => GestureDetector(
+        onTap: () => _onSortTap(context),
+        behavior: HitTestBehavior.translucent,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                orderType.text,
+                style: TextStyle(
+                  color: color233067,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14.sp,
+                  height: 1,
+                  leadingDistribution: TextLeadingDistribution.even,
+                ),
               ),
-            ),
-            SizedBox(width: 4.w),
-            Assets.svg.iconSort.svg(
-              width: 22.w,
-              height: 22.w,
-            ),
-          ],
+              SizedBox(width: 4.w),
+              Assets.svg.iconSort.svg(
+                width: 22.w,
+                height: 22.w,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -101,184 +143,84 @@ class DiaryPage extends StatelessWidget {
     return Selector<DiaryPageViewModel, List<DiaryItemData>?>(
       selector: (_, viewModel) => viewModel.items,
       builder: (_, items, __) => items == null
-          ? const Center(
-              child: CircularProgressIndicator(color: color233067),
-            )
-          : ListView.separated(
-              itemCount: items.length,
-              padding: EdgeInsets.fromLTRB(16.w, 16.w, 16.w, 20.w),
-              separatorBuilder: (_, __) => SizedBox(height: 20.w),
-              itemBuilder: (_, index) => _DiaryItemCard(
-                item: items[index],
-                onTap: () {},
+          ? const Align(
+              alignment: Alignment.topCenter,
+              child: RefreshProgressIndicator(
+                color: color233067,
+                backgroundColor: Colors.white,
               ),
-            ),
+            )
+          : items.isEmpty
+              ? _buildEmptyMessage()
+              : ListView.separated(
+                  controller: _scrollController,
+                  itemCount: items.length,
+                  padding: EdgeInsets.fromLTRB(16.w, 16.w, 16.w, 20.w),
+                  separatorBuilder: (_, __) => SizedBox(height: 20.w),
+                  itemBuilder: (_, index) => DiaryItemCard(
+                    item: items[index],
+                    onTap: () {},
+                  ),
+                ),
+    );
+  }
+
+  Widget _buildEmptyMessage() {
+    final textStyle = TextStyle(
+      color: color999DAC,
+      fontWeight: FontWeight.w500,
+      fontSize: 16.sp,
+      height: 1.25,
+      leadingDistribution: TextLeadingDistribution.even,
+    );
+
+    return Padding(
+      padding: EdgeInsets.only(top: 177.w),
+      child: Column(
+        children: [
+          Text(
+            "작성한 일기가 없어요.",
+            style: textStyle,
+          ),
+          SizedBox(height: 10.w),
+          Text(
+            "+ 버튼으로 일기작성을 시작해보세요!",
+            style: textStyle,
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _onFilterTap(BuildContext context) async {
-    showModalBottomSheet(
+    final viewModel = context.read<DiaryPageViewModel>();
+
+    final result = await showModalBottomSheet(
       context: rootContext!,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => DiaryFilterBottomSheet(),
+      builder: (_) => DiaryFilterBottomSheet(
+        isTagFilterSelected: viewModel.isTagFilterSelected,
+        isImageFilterSelected: viewModel.isImageFilterSelected,
+        isRecordFilterSelected: viewModel.isRecordFilterSelected,
+        filterMonth: viewModel.filterMonth,
+        orderType: viewModel.orderType,
+      ),
     );
+
+    viewModel.onFilterChanged(result);
   }
 
   Future<void> _onSortTap(BuildContext context) async {
-    showModalBottomSheet(
+    final viewModel = context.read<DiaryPageViewModel>();
+
+    final result = await showModalBottomSheet(
       context: rootContext!,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => DiarySortBottomSheet(),
+      builder: (_) => DiarySortBottomSheet(orderType: viewModel.orderType),
     );
-  }
-}
 
-class _DiaryItemCard extends StatelessWidget {
-  final DiaryItemData item;
-  final VoidCallback onTap;
-
-  const _DiaryItemCard({
-    required this.item,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(14.w, 14.w, 14.w, 20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildRepresentaionImage(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildDate(),
-              _buildHashTagList(),
-            ],
-          ),
-          Container(
-            height: 1,
-            margin: EdgeInsets.only(top: 9.w),
-            color: colorE4E7ED,
-          ),
-          SizedBox(height: 20.w),
-          _buildContent(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRepresentaionImage() {
-    if (item.images?.isEmpty ?? true) return const SizedBox.shrink();
-
-    return Container(
-      height: 168.w,
-      margin: EdgeInsets.only(bottom: 14.w),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          image: DecorationImage(image: NetworkImage(item.images!.first), fit: BoxFit.cover)),
-    );
-  }
-
-  Widget _buildDate() {
-    return Text(
-      DateFormat("yyyy년 M월 d일 E요일", "ko_KR").format(item.date),
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
-        fontSize: 16.sp,
-        height: 1.25,
-        leadingDistribution: TextLeadingDistribution.even,
-      ),
-    );
-  }
-
-  Widget _buildHashTagList() {
-    return Row(
-      children: [
-        if (item.images?.isNotEmpty ?? false) ...[
-          _buildHashTag(
-            Assets.svg.iconAlbum.svg(
-              width: 14.w,
-              height: 14.w,
-              colorFilter: const ColorFilter.mode(
-                color999DAC,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-          SizedBox(width: 6.w),
-        ],
-        if (item.records?.isNotEmpty ?? false) ...[
-          _buildHashTag(
-            Assets.svg.iconMic.svg(
-              width: 14.w,
-              height: 14.w,
-              colorFilter: const ColorFilter.mode(
-                color999DAC,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-          SizedBox(width: 6.w),
-        ],
-        if (item.tags?.isNotEmpty ?? false)
-          _buildHashTag(
-            Assets.svg.iconTag.svg(
-              width: 14.w,
-              height: 14.w,
-              colorFilter: const ColorFilter.mode(
-                color999DAC,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildHashTag(Widget icon) {
-    return Container(
-      width: 20.w,
-      height: 20.w,
-      decoration: BoxDecoration(
-        color: colorF1F2F7,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      alignment: Alignment.center,
-      child: icon,
-    );
-  }
-
-  Widget _buildContent() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        item.description,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.w400,
-          fontSize: 16.sp,
-          height: 1,
-          leadingDistribution: TextLeadingDistribution.even,
-        ),
-      ),
-    );
+    viewModel.onOrderTypeChanged(result);
   }
 }

@@ -25,10 +25,10 @@ mixin _$DiaryListRequest {
   int get take => throw _privateConstructorUsedError;
   @JsonKey(name: "filter_month")
   int? get filterMonth => throw _privateConstructorUsedError;
-  @JsonKey(name: "filter_tag")
-  bool get filterTag => throw _privateConstructorUsedError;
-  @JsonKey(name: "filter_image")
-  bool get filterImage => throw _privateConstructorUsedError;
+  @JsonKey(name: "filter_tags")
+  bool get filterTags => throw _privateConstructorUsedError;
+  @JsonKey(name: "filter_images")
+  bool get filterImages => throw _privateConstructorUsedError;
   @JsonKey(name: "filter_records")
   bool get filterRecords => throw _privateConstructorUsedError;
 
@@ -49,8 +49,8 @@ abstract class $DiaryListRequestCopyWith<$Res> {
       int page,
       int take,
       @JsonKey(name: "filter_month") int? filterMonth,
-      @JsonKey(name: "filter_tag") bool filterTag,
-      @JsonKey(name: "filter_image") bool filterImage,
+      @JsonKey(name: "filter_tags") bool filterTags,
+      @JsonKey(name: "filter_images") bool filterImages,
       @JsonKey(name: "filter_records") bool filterRecords});
 }
 
@@ -71,8 +71,8 @@ class _$DiaryListRequestCopyWithImpl<$Res, $Val extends DiaryListRequest>
     Object? page = null,
     Object? take = null,
     Object? filterMonth = freezed,
-    Object? filterTag = null,
-    Object? filterImage = null,
+    Object? filterTags = null,
+    Object? filterImages = null,
     Object? filterRecords = null,
   }) {
     return _then(_value.copyWith(
@@ -92,13 +92,13 @@ class _$DiaryListRequestCopyWithImpl<$Res, $Val extends DiaryListRequest>
           ? _value.filterMonth
           : filterMonth // ignore: cast_nullable_to_non_nullable
               as int?,
-      filterTag: null == filterTag
-          ? _value.filterTag
-          : filterTag // ignore: cast_nullable_to_non_nullable
+      filterTags: null == filterTags
+          ? _value.filterTags
+          : filterTags // ignore: cast_nullable_to_non_nullable
               as bool,
-      filterImage: null == filterImage
-          ? _value.filterImage
-          : filterImage // ignore: cast_nullable_to_non_nullable
+      filterImages: null == filterImages
+          ? _value.filterImages
+          : filterImages // ignore: cast_nullable_to_non_nullable
               as bool,
       filterRecords: null == filterRecords
           ? _value.filterRecords
@@ -121,8 +121,8 @@ abstract class _$$DiaryListRequestImplCopyWith<$Res>
       int page,
       int take,
       @JsonKey(name: "filter_month") int? filterMonth,
-      @JsonKey(name: "filter_tag") bool filterTag,
-      @JsonKey(name: "filter_image") bool filterImage,
+      @JsonKey(name: "filter_tags") bool filterTags,
+      @JsonKey(name: "filter_images") bool filterImages,
       @JsonKey(name: "filter_records") bool filterRecords});
 }
 
@@ -141,8 +141,8 @@ class __$$DiaryListRequestImplCopyWithImpl<$Res>
     Object? page = null,
     Object? take = null,
     Object? filterMonth = freezed,
-    Object? filterTag = null,
-    Object? filterImage = null,
+    Object? filterTags = null,
+    Object? filterImages = null,
     Object? filterRecords = null,
   }) {
     return _then(_$DiaryListRequestImpl(
@@ -162,13 +162,13 @@ class __$$DiaryListRequestImplCopyWithImpl<$Res>
           ? _value.filterMonth
           : filterMonth // ignore: cast_nullable_to_non_nullable
               as int?,
-      filterTag: null == filterTag
-          ? _value.filterTag
-          : filterTag // ignore: cast_nullable_to_non_nullable
+      filterTags: null == filterTags
+          ? _value.filterTags
+          : filterTags // ignore: cast_nullable_to_non_nullable
               as bool,
-      filterImage: null == filterImage
-          ? _value.filterImage
-          : filterImage // ignore: cast_nullable_to_non_nullable
+      filterImages: null == filterImages
+          ? _value.filterImages
+          : filterImages // ignore: cast_nullable_to_non_nullable
               as bool,
       filterRecords: null == filterRecords
           ? _value.filterRecords
@@ -186,8 +186,8 @@ class _$DiaryListRequestImpl implements _DiaryListRequest {
       required this.page,
       this.take = 10,
       @JsonKey(name: "filter_month") this.filterMonth,
-      @JsonKey(name: "filter_tag") this.filterTag = false,
-      @JsonKey(name: "filter_image") this.filterImage = false,
+      @JsonKey(name: "filter_tags") this.filterTags = false,
+      @JsonKey(name: "filter_images") this.filterImages = false,
       @JsonKey(name: "filter_records") this.filterRecords = false});
 
   factory _$DiaryListRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -204,18 +204,18 @@ class _$DiaryListRequestImpl implements _DiaryListRequest {
   @JsonKey(name: "filter_month")
   final int? filterMonth;
   @override
-  @JsonKey(name: "filter_tag")
-  final bool filterTag;
+  @JsonKey(name: "filter_tags")
+  final bool filterTags;
   @override
-  @JsonKey(name: "filter_image")
-  final bool filterImage;
+  @JsonKey(name: "filter_images")
+  final bool filterImages;
   @override
   @JsonKey(name: "filter_records")
   final bool filterRecords;
 
   @override
   String toString() {
-    return 'DiaryListRequest(order: $order, page: $page, take: $take, filterMonth: $filterMonth, filterTag: $filterTag, filterImage: $filterImage, filterRecords: $filterRecords)';
+    return 'DiaryListRequest(order: $order, page: $page, take: $take, filterMonth: $filterMonth, filterTags: $filterTags, filterImages: $filterImages, filterRecords: $filterRecords)';
   }
 
   @override
@@ -228,10 +228,10 @@ class _$DiaryListRequestImpl implements _DiaryListRequest {
             (identical(other.take, take) || other.take == take) &&
             (identical(other.filterMonth, filterMonth) ||
                 other.filterMonth == filterMonth) &&
-            (identical(other.filterTag, filterTag) ||
-                other.filterTag == filterTag) &&
-            (identical(other.filterImage, filterImage) ||
-                other.filterImage == filterImage) &&
+            (identical(other.filterTags, filterTags) ||
+                other.filterTags == filterTags) &&
+            (identical(other.filterImages, filterImages) ||
+                other.filterImages == filterImages) &&
             (identical(other.filterRecords, filterRecords) ||
                 other.filterRecords == filterRecords));
   }
@@ -239,7 +239,7 @@ class _$DiaryListRequestImpl implements _DiaryListRequest {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, order, page, take, filterMonth,
-      filterTag, filterImage, filterRecords);
+      filterTags, filterImages, filterRecords);
 
   @JsonKey(ignore: true)
   @override
@@ -262,8 +262,8 @@ abstract class _DiaryListRequest implements DiaryListRequest {
           required final int page,
           final int take,
           @JsonKey(name: "filter_month") final int? filterMonth,
-          @JsonKey(name: "filter_tag") final bool filterTag,
-          @JsonKey(name: "filter_image") final bool filterImage,
+          @JsonKey(name: "filter_tags") final bool filterTags,
+          @JsonKey(name: "filter_images") final bool filterImages,
           @JsonKey(name: "filter_records") final bool filterRecords}) =
       _$DiaryListRequestImpl;
 
@@ -280,11 +280,11 @@ abstract class _DiaryListRequest implements DiaryListRequest {
   @JsonKey(name: "filter_month")
   int? get filterMonth;
   @override
-  @JsonKey(name: "filter_tag")
-  bool get filterTag;
+  @JsonKey(name: "filter_tags")
+  bool get filterTags;
   @override
-  @JsonKey(name: "filter_image")
-  bool get filterImage;
+  @JsonKey(name: "filter_images")
+  bool get filterImages;
   @override
   @JsonKey(name: "filter_records")
   bool get filterRecords;
