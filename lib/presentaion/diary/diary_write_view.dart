@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,26 +15,11 @@ import 'package:provider/provider.dart';
 
 import 'components/diary_write_components.dart';
 
-class DiaryWriteView extends StatefulWidget {
+class DiaryWriteView extends StatelessWidget {
   const DiaryWriteView({super.key});
 
   static const String path = "/diary-write";
   static const String name = "DiaryWriteView";
-
-  @override
-  State<DiaryWriteView> createState() => _DiaryWriteViewState();
-}
-
-class _DiaryWriteViewState extends State<DiaryWriteView> {
-  final FocusNode _focusNode = FocusNode();
-  final PlayerController _playerController = PlayerController();
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _playerController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,8 +124,7 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
       selector: (_, viewModel) => viewModel.recordFile,
       builder: (context, file, __) => file == null
           ? const SizedBox.shrink()
-          : RecordPlayer(
-              playerController: _playerController,
+          : AudioPlayer(
               file: file,
               onDeleteTap: context.read<DiaryWriteViewModel>().deleteRecordFile,
             ),
@@ -163,7 +146,6 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
   Widget _buildTextField(BuildContext context) {
     return CustomTextField(
       initialText: context.read<DiaryWriteViewModel>().content,
-      focusNode: _focusNode,
       autoFocus: true,
       scrollPhysics: const NeverScrollableScrollPhysics(),
       hintText: "일기 내용을 적어주세요.",
@@ -282,7 +264,7 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
   }
 
   Future<void> _onAlbumTap(BuildContext context) async {
-    _focusNode.unfocus();
+    // _focusNode.unfocus();
 
     final viewModel = context.read<DiaryWriteViewModel>();
 
@@ -298,23 +280,19 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
 
       viewModel.addImage(image);
 
-      _focusNode.requestFocus();
+      // _focusNode.requestFocus();
     } catch (e) {
       showToast(message: "이미지를 불러오는데 실패했습니다.");
     }
   }
 
   Future<void> _onRecordTap(BuildContext context) async {
-    if (_playerController.playerState.isPlaying) _playerController.pausePlayer();
-
     final viewModel = context.read<DiaryWriteViewModel>();
 
     final result = await showModalBottomSheet<File>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => VoiceRecordBottomSheet(
-        playerController: _playerController,
-      ),
+      builder: (_) => const VoiceRecordBottomSheet(),
     );
 
     viewModel.onRecordFileChanged(result);
