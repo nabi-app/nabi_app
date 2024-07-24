@@ -17,7 +17,10 @@ class Throttle {
 
     _timer = Timer(
       duration,
-      () => _waiting = false,
+      () {
+        _waiting = false;
+        _timer!.cancel();
+      },
     );
   }
 

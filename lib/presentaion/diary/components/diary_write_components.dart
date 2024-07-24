@@ -13,6 +13,9 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:nabi_app/utils/permission_request.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:audioplayers/audioplayers.dart' as ap;
+import 'package:audioplayers/audioplayers.dart';
 
 class ImageCarouselSlider extends StatefulWidget {
   final List<File> images;
@@ -151,26 +154,27 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
   }
 }
 
-class RecordPlayer extends StatefulWidget {
-  final PlayerController playerController;
+class AudioPlayer extends StatefulWidget {
   final File file;
   final void Function() onDeleteTap;
 
-  const RecordPlayer({super.key,
-    required this.playerController,
+  const AudioPlayer({
+    super.key,
     required this.file,
     required this.onDeleteTap,
   });
 
   @override
-  State<RecordPlayer> createState() => _RecordPlayerState();
+  State<AudioPlayer> createState() => _AudioPlayerState();
 }
 
-class _RecordPlayerState extends State<RecordPlayer> {
-  late final PlayerController _playerController = widget.playerController;
-  late StreamSubscription _playerCompletionSubscription;
-  late StreamSubscription<int> _playerDurationSubscription;
+class _AudioPlayerState extends State<AudioPlayer> {
+  final PlayerController _playerController = PlayerController();
+  StreamSubscription? _playerCompletionSubscription;
+  StreamSubscription<int>? _playerDurationSubscription;
+
   List<double>? _waveFormData;
+
   bool _isLoading = true;
   int _playerTimeSeconds = 0;
   int _playerRemainSeconds = 0;
@@ -179,39 +183,45 @@ class _RecordPlayerState extends State<RecordPlayer> {
   void initState() {
     super.initState();
     _initPlayer();
-
-    _playerDurationSubscription = _playerController.onCurrentDurationChanged.listen(
-          (duration) {
-        _playerRemainSeconds = _playerTimeSeconds - duration;
-        setState(() {});
-      },
-    );
-
-    _playerCompletionSubscription = _playerController.onCompletion.listen(
-          (_) async {
-        await _playerController.stopPlayer();
-        await _playerController.preparePlayer(path: widget.file.path);
-        _playerRemainSeconds = _playerTimeSeconds;
-        setState(() {});
-      },
-    );
   }
 
   Future<void> _initPlayer() async {
     _isLoading = true;
     setState(() {});
 
-    await _playerController.preparePlayer(path: widget.file.path, noOfSamples: 17);
+    await _playerController.preparePlayer(
+      path: widget.file.path,
+      noOfSamples: 17,
+    );
     _waveFormData = _playerController.waveformData;
     _playerTimeSeconds = _playerController.maxDuration;
     _playerRemainSeconds = _playerController.maxDuration;
 
     _isLoading = false;
     setState(() {});
+
+    _playerDurationSubscription ??= _playerController.onCurrentDurationChanged.listen(
+      (duration) {
+        _playerRemainSeconds = _playerTimeSeconds - duration;
+        setState(() {});
+      },
+    );
+
+    _playerCompletionSubscription ??= _playerController.onCompletion.listen(
+      (_) async {
+        await _playerController.stopPlayer();
+        await _playerController.preparePlayer(
+          path: widget.file.path,
+          noOfSamples: 17,
+        );
+        _playerRemainSeconds = _playerTimeSeconds;
+        setState(() {});
+      },
+    );
   }
 
   @override
-  void didUpdateWidget(covariant RecordPlayer oldWidget) {
+  void didUpdateWidget(covariant AudioPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.file.hashCode != widget.file.hashCode) {
       _initPlayer();
@@ -220,8 +230,8 @@ class _RecordPlayerState extends State<RecordPlayer> {
 
   @override
   void dispose() {
-    _playerDurationSubscription.cancel();
-    _playerCompletionSubscription.cancel();
+    _playerDurationSubscription?.cancel();
+    _playerCompletionSubscription?.cancel();
     super.dispose();
   }
 
@@ -260,7 +270,7 @@ class _RecordPlayerState extends State<RecordPlayer> {
       waveformType: WaveformType.fitWidth,
       playerWaveStyle: PlayerWaveStyle(
         fixedWaveColor: colorC5CFF2,
-        liveWaveColor: Colors.blueAccent,
+        liveWaveColor: color233067,
         spacing: 13.5.w,
         waveThickness: 6.w,
         scaleFactor: 300,
@@ -511,11 +521,8 @@ class _HashTagBottomSheetState extends State<HashTagBottomSheet> {
 }
 
 class VoiceRecordBottomSheet extends StatefulWidget {
-  final PlayerController playerController;
-
   const VoiceRecordBottomSheet({
     super.key,
-    required this.playerController,
   });
 
   @override
@@ -523,58 +530,84 @@ class VoiceRecordBottomSheet extends StatefulWidget {
 }
 
 class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
-  final RecorderController _recorderController = RecorderController()
-    ..androidEncoder = AndroidEncoder.aac
-    ..androidOutputFormat = AndroidOutputFormat.mpeg4
-    ..iosEncoder = IosEncoder.kAudioFormatMPEG4AAC;
-  late StreamSubscription<Duration> _recorderDurationSubscription;
-
-  late final PlayerController _playerController = widget.playerController;
-  late StreamSubscription<int> _playerDurationSubscription;
-  late StreamSubscription _playerCompletionSubscription;
-
-  late final Directory _appDirectory;
+  late final AudioRecorder _recorder;
+  RecordState _recordState = RecordState.stop;
+  StreamSubscription<RecordState>? _recorderStateSubscription;
   late final String _filePath;
-  int _playerRemainSeconds = 0;
+  Timer? _recordTimer;
+  int _recordTime = 0;
+
+  ap.AudioPlayer? _player;
+  StreamSubscription<Duration>? _playerPositionSubscription;
+  StreamSubscription<ap.PlayerState>? _playerStateSubscription;
+  int _playerTime = 0;
+  int _playerRemainTime = 0;
+
   bool _recordCompleted = false;
 
   @override
   void initState() {
     super.initState();
-    _setDirectory();
+    _init();
+  }
 
-    _recorderDurationSubscription = _recorderController.onCurrentDuration.listen(
-      (duration) {
-        if (duration.inMilliseconds % 1000 == 0) {
-          setState(() {});
-        }
-      },
-    );
+  Future<void> _init() async {
+    final isGranted = await requestMicPermission();
 
-    _playerDurationSubscription = _playerController.onCurrentDurationChanged.listen(
-      (duration) {
-        _playerRemainSeconds = (_recorderController.recordedDuration.inMilliseconds - duration) ~/ 1000;
-        setState(() {});
-      },
-    );
+    if (!isGranted) return;
 
-    _playerCompletionSubscription = _playerController.onCompletion.listen(
-      (_) => _stopPlay(),
-    );
+    await _setDirectory();
+
+    _initRecorder();
   }
 
   Future<void> _setDirectory() async {
-    _appDirectory = await getApplicationDocumentsDirectory();
-    _filePath = "${_appDirectory.path}/record.m4a";
+    final appDirectory = await getApplicationDocumentsDirectory();
+    _filePath = "${appDirectory.path}/record.m4a";
+  }
+
+  void _initRecorder() {
+    _recorder = AudioRecorder();
+
+    _recorderStateSubscription = _recorder.onStateChanged().listen(
+      (state) {
+        if (state == RecordState.stop) _initPlayer();
+
+        _recordState = state;
+        setState(() {});
+      },
+    );
+  }
+
+  Future<void> _initPlayer() async {
+    _player = ap.AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+
+    await _player!.setSourceDeviceFile(_filePath);
+
+    _playerStateSubscription = _player!.onPlayerStateChanged.listen(
+      (_) => setState(() {}),
+    );
+
+    _playerPositionSubscription = _player!.onPositionChanged.listen(
+      (duration) {
+        final calculatedSeconds = _playerTime - duration.inSeconds;
+
+        if (_playerRemainTime == calculatedSeconds) return;
+
+        _playerRemainTime = calculatedSeconds;
+        setState(() {});
+      },
+    );
   }
 
   @override
   void dispose() {
-    _recorderController.dispose();
-    // _playerController.dispose();
-    _recorderDurationSubscription.cancel();
-    _playerDurationSubscription.cancel();
-    _playerCompletionSubscription.cancel();
+    _recorderStateSubscription?.cancel();
+    _playerStateSubscription?.cancel();
+    _playerPositionSubscription?.cancel();
+    _recorder.dispose();
+    _player?.dispose();
+    _recordTimer?.cancel();
     super.dispose();
   }
 
@@ -629,7 +662,7 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
   }
 
   Widget _buildRecordControlButton() {
-    if (_recorderController.isRecording) {
+    if (_recordState == RecordState.record) {
       return GestureDetector(
         onTap: _stopRecord,
         child: AvatarGlow(
@@ -679,7 +712,7 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
 
   Widget _buildRecordTimeText() {
     return Text(
-      _generateTimeText(_recorderController.elapsedDuration.inSeconds),
+      _generateTimeText(_recordTime),
       style: TextStyle(
         color: color999DAC,
         fontWeight: FontWeight.w500,
@@ -716,7 +749,7 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
       ],
     );
 
-    if (_playerController.playerState.isPlaying) {
+    if (_player!.state == ap.PlayerState.playing) {
       return GestureDetector(
         onTap: _stopPlay,
         child: Container(
@@ -751,7 +784,7 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
               ),
               SizedBox(width: 10.w),
               Text(
-                _generateTimeText(_playerRemainSeconds),
+                _generateTimeText(_playerRemainTime),
                 style: textStyle,
               ),
             ],
@@ -797,7 +830,7 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
             ),
             SizedBox(width: 10.w),
             Text(
-              _generateTimeText(_playerController.maxDuration ~/ 1000),
+              _generateTimeText(_playerTime),
               style: textStyle,
             ),
           ],
@@ -830,63 +863,51 @@ class _VoiceRecordBottomSheetState extends State<VoiceRecordBottomSheet> {
   }
 
   Future<void> _startRecord() async {
-    final isPermissionGranted = await requestMicPermission();
-
-    if (!isPermissionGranted) return;
-
     _recordCompleted = false;
 
-    if (_playerController.playerState.isPlaying) {
-      await _playerController.stopPlayer();
-    }
+    await _player?.stop();
 
-    await _recorderController.record(path: _filePath);
+    await _recorder.start(
+      const RecordConfig(encoder: AudioEncoder.aacLc),
+      path: _filePath,
+    );
 
-    setState(() {});
+    _startRecordTimer();
   }
 
   Future<void> _stopRecord() async {
     _recordCompleted = true;
 
-    await _recorderController.stop();
+    await _recorder.stop();
 
-    await _playerController.preparePlayer(
-      path: _filePath,
-      shouldExtractWaveform: false,
-    );
-
-    setState(() {});
+    _stopRecordTimer();
   }
 
   Future<void> _startPlay() async {
-    try {
-      _playerRemainSeconds = _recorderController.recordedDuration.inSeconds;
-
-      await _playerController.preparePlayer(
-        path: _filePath,
-        shouldExtractWaveform: false,
-      );
-
-      await _playerController.startPlayer();
-
-      setState(() {});
-    } catch (e) {
-      showToast(message: "오류가 발생했습니다.");
-    }
+    await _player!.play(ap.DeviceFileSource(_filePath));
   }
 
   Future<void> _stopPlay() async {
-    await _playerController.stopPlayer();
-
-    setState(() {});
+    await _player!.stop();
   }
 
   Future<void> _deleteRecord() async {
-    if (_playerController.playerState.isPlaying) {
-      await _playerController.stopPlayer();
-    }
-
     _recordCompleted = false;
+    setState(() {});
+  }
+
+  void _startRecordTimer() {
+    _recordTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() => _recordTime += 1),
+    );
+  }
+
+  void _stopRecordTimer() {
+    _playerTime = _recordTime;
+
+    _recordTimer!.cancel();
+    _recordTime = 0;
 
     setState(() {});
   }
