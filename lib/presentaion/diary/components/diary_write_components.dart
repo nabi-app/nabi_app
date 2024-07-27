@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/presentaion/diary/diary_write_image_detail_view.dart';
@@ -9,6 +8,7 @@ import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'dart:async';
 import 'dart:io';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:nabi_app/utils/permission_request.dart';
 import 'package:avatar_glow/avatar_glow.dart';
@@ -19,12 +19,12 @@ import 'package:audioplayers/audioplayers.dart';
 
 class ImageCarouselSlider extends StatefulWidget {
   final List<File> images;
-  final void Function(int index) removeImage;
+  final Function(int index)? removeImage;
 
   const ImageCarouselSlider({
     super.key,
     required this.images,
-    required this.removeImage,
+    this.removeImage,
   });
 
   @override
@@ -33,6 +33,8 @@ class ImageCarouselSlider extends StatefulWidget {
 
 class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
   int _page = 1;
+
+  bool get _editable => widget.removeImage != null;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: FileImage(images[index]),
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -95,16 +97,18 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
   }
 
   Widget _buildCloseButton() {
+    if (!_editable) return const SizedBox.shrink();
+
     return Positioned(
       top: 12.w,
       right: 12.w,
       child: GestureDetector(
         onTap: () {
-          widget.removeImage(_page - 1);
+          widget.removeImage!(_page - 1);
 
-          if (widget.images.length == _page) {
-            _page -= 1;
-          }
+          if (widget.images.length != _page) return;
+
+          _page -= 1;
         },
         child: Container(
           width: 18.w,
@@ -155,13 +159,15 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
 }
 
 class AudioPlayer extends StatefulWidget {
+  final PlayerController playerController;
   final File file;
-  final void Function() onDeleteTap;
+  final VoidCallback? onDeleteTap;
 
   const AudioPlayer({
     super.key,
+    required this.playerController,
     required this.file,
-    required this.onDeleteTap,
+    this.onDeleteTap,
   });
 
   @override
@@ -169,7 +175,7 @@ class AudioPlayer extends StatefulWidget {
 }
 
 class _AudioPlayerState extends State<AudioPlayer> {
-  final PlayerController _playerController = PlayerController();
+  late PlayerController _playerController;
   StreamSubscription? _playerCompletionSubscription;
   StreamSubscription<int>? _playerDurationSubscription;
 
@@ -179,6 +185,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
   int _playerTimeSeconds = 0;
   int _playerRemainSeconds = 0;
 
+  bool get _editable => widget.onDeleteTap != null;
+
   @override
   void initState() {
     super.initState();
@@ -186,6 +194,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
   }
 
   Future<void> _initPlayer() async {
+    _playerController = widget.playerController;
+
     _isLoading = true;
     setState(() {});
 
@@ -193,6 +203,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
       path: widget.file.path,
       noOfSamples: 17,
     );
+
     _waveFormData = _playerController.waveformData;
     _playerTimeSeconds = _playerController.maxDuration;
     _playerRemainSeconds = _playerController.maxDuration;
@@ -323,13 +334,15 @@ class _AudioPlayerState extends State<AudioPlayer> {
   }
 
   Widget _buildDeleteButton(BuildContext context) {
+    if (!_editable) return const SizedBox.shrink();
+
     return Positioned(
       top: 10.w,
       right: 10.w,
       child: GestureDetector(
         onTap: () async {
           await _playerController.stopPlayer();
-          widget.onDeleteTap();
+          widget.onDeleteTap!();
         },
         child: Container(
           width: 18.w,
@@ -374,26 +387,24 @@ class _HashTagBottomSheetState extends State<HashTagBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardVisibilityBuilder(
-      builder: (_, isKeyboardVisible) => GestureDetector(
-        onTap: () => WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
-        child: BottomSheetFrame(
-          title: "태그 입력 하기",
-          completeButtonText: isKeyboardVisible ? null : "태그 입력 하기",
-          onComplete: () => context.pop(_hashTags),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.w),
-            child: Column(
-              children: [
-                SizedBox(height: 30.w),
-                _buildTextField(),
-                Container(
-                  color: colorE4E7ED,
-                  height: 1,
-                ),
-                _buildHashTags(isKeyboardVisible),
-              ],
-            ),
+    return GestureDetector(
+      onTap: () => WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
+      child: BottomSheetFrame(
+        title: "태그 입력 하기",
+        completeButtonText: "태그 입력 하기",
+        onComplete: () => context.pop(_hashTags),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30.w),
+          child: Column(
+            children: [
+              SizedBox(height: 30.w),
+              _buildTextField(),
+              Container(
+                color: colorE4E7ED,
+                height: 1,
+              ),
+              _buildHashTags(),
+            ],
           ),
         ),
       ),
@@ -421,35 +432,7 @@ class _HashTagBottomSheetState extends State<HashTagBottomSheet> {
       contentPadding: EdgeInsets.symmetric(vertical: 15.w),
       prefixIcon: _buildHashTagIcon(),
       prefixConstraints: BoxConstraints(maxWidth: 16.w),
-      suffixIcon: GestureDetector(
-        onTap: () {
-          final text = _textEditingController.text;
-
-          if (text.isEmpty) return;
-
-          _textEditingController.clear();
-          _hashTags.add(text);
-          setState(() {});
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(100),
-          ),
-          margin: EdgeInsets.only(left: 10.w),
-          alignment: Alignment.center,
-          child: Text(
-            "추가",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: 16.sp,
-              height: 1,
-              leadingDistribution: TextLeadingDistribution.even,
-            ),
-          ),
-        ),
-      ),
+      suffixIcon: _buildAddButton(),
       suffixConstraints: BoxConstraints(
         maxWidth: 62.w,
         maxHeight: 32.w,
@@ -457,10 +440,50 @@ class _HashTagBottomSheetState extends State<HashTagBottomSheet> {
     );
   }
 
-  Widget _buildHashTags(bool isKeyboardVisible) {
+  Widget _buildAddButton() {
+    return GestureDetector(
+      onTap: () {
+        if (_textEditingController.text.isEmpty) return;
+
+        if (_hashTags.length == 5) {
+          showToast(message: "태그는 최대 5개까지 추가할 수 있어요.");
+          return;
+        }
+
+        final text = _textEditingController.text;
+
+        if (text.isEmpty) return;
+
+        _textEditingController.clear();
+        _hashTags.add(text);
+        setState(() {});
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        margin: EdgeInsets.only(left: 10.w),
+        alignment: Alignment.center,
+        child: Text(
+          "추가",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 16.sp,
+            height: 1,
+            leadingDistribution: TextLeadingDistribution.even,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHashTags() {
     return SizedBox(
-      height: isKeyboardVisible ? 150.w : 316.w,
+      height: 316.w,
       child: ListView.separated(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: EdgeInsets.only(top: 10.w, bottom: 16.w),
         itemCount: _hashTags.length,
         separatorBuilder: (_, __) => SizedBox(height: 12.w),

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:nabi_app/domain/model/diary_list_response.dart';
+import 'package:nabi_app/domain/model/diary_item_data.dart';
 import 'package:nabi_app/enum/diary_type.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/components/custom_widget.dart';
@@ -21,38 +21,41 @@ class DiaryItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(14.w, 14.w, 14.w, 20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildRepresentaionImage(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildDate(),
-              _buildHashTagList(),
-            ],
-          ),
-          Container(
-            height: 1,
-            margin: EdgeInsets.only(top: 9.w),
-            color: colorE4E7ED,
-          ),
-          SizedBox(height: 20.w),
-          _buildContent(),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(14.w, 14.w, 14.w, 20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, 0),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            _buildRepresentaionImage(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildDate(),
+                _buildHashTagList(),
+              ],
+            ),
+            Container(
+              height: 1,
+              margin: EdgeInsets.only(top: 9.w),
+              color: colorE4E7ED,
+            ),
+            SizedBox(height: 20.w),
+            _buildContent(),
+          ],
+        ),
       ),
     );
   }
@@ -143,7 +146,7 @@ class DiaryItemCard extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        item.description,
+        item.content,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -410,15 +413,15 @@ class _DiaryFilterBottomSheetState extends State<DiaryFilterBottomSheet> {
         _title("정렬기준"),
         SizedBox(height: 24.w),
         DiaryRadioButton(
-          text: DiaryListOrderType.asc.text,
-          selected: _orderType == DiaryListOrderType.asc,
-          onSelect: () => setState(() => _orderType = DiaryListOrderType.asc),
-        ),
-        SizedBox(height: 24.w),
-        DiaryRadioButton(
           text: DiaryListOrderType.desc.text,
           selected: _orderType == DiaryListOrderType.desc,
           onSelect: () => setState(() => _orderType = DiaryListOrderType.desc),
+        ),
+        SizedBox(height: 24.w),
+        DiaryRadioButton(
+          text: DiaryListOrderType.asc.text,
+          selected: _orderType == DiaryListOrderType.asc,
+          onSelect: () => setState(() => _orderType = DiaryListOrderType.asc),
         ),
       ],
     );
@@ -553,15 +556,15 @@ class _DiarySortBottomSheetState extends State<DiarySortBottomSheet> {
           ),
           SizedBox(height: 24.w),
           DiaryRadioButton(
-            text: DiaryListOrderType.asc.text,
-            selected: _orderType == DiaryListOrderType.asc,
-            onSelect: () => _onSelect(DiaryListOrderType.asc),
-          ),
-          SizedBox(height: 24.w),
-          DiaryRadioButton(
             text: DiaryListOrderType.desc.text,
             selected: _orderType == DiaryListOrderType.desc,
             onSelect: () => _onSelect(DiaryListOrderType.desc),
+          ),
+          SizedBox(height: 24.w),
+          DiaryRadioButton(
+            text: DiaryListOrderType.asc.text,
+            selected: _orderType == DiaryListOrderType.asc,
+            onSelect: () => _onSelect(DiaryListOrderType.asc),
           ),
         ],
       ),

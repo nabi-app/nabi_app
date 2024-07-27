@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/di/di_setup.dart';
+import 'package:nabi_app/domain/model/diary_item_data.dart';
 import 'package:nabi_app/domain/model/sign_up_transmission_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_page_view_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_write_image_detail_view.dart';
@@ -111,8 +112,8 @@ final GoRouter routerConfig = GoRouter(
     GoRoute(
         path: DiaryWriteView.path,
         name: DiaryWriteView.name,
-        builder: (_, __) => ChangeNotifierProvider(
-              create: (_) => getIt<DiaryWriteViewModel>(),
+        builder: (_, state) => ChangeNotifierProvider(
+              create: (_) => getIt<DiaryWriteViewModel>(param1: state.extra as DiaryItemData?),
               builder: (_, __) => const DiaryWriteView(),
             ),
         routes: [

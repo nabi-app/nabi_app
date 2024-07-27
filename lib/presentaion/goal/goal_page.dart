@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/presentaion/goal/components/goal_page_components.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
-import 'package:nabi_app/utils/ui/components/custom_widget.dart';
+import 'package:nabi_app/utils/ui/components/custom_dialog.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 
 class GoalPage extends StatelessWidget {
