@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
-import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+
+class CustomProgressIndicator extends StatelessWidget {
+  const CustomProgressIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Align(
+      alignment: Alignment.topCenter,
+      child: RefreshProgressIndicator(
+        color: color233067,
+        backgroundColor: Colors.white,
+      ),
+    );
+  }
+}
 
 class CustomScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
@@ -140,142 +152,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
   }
 }
 
-class CustomDialog extends StatelessWidget {
-  final String title;
-  final String subTitle;
-  final String? button1Text;
-  final String? button2Text;
-  final VoidCallback? onButton1Tap;
-  final VoidCallback? onButton2Tap;
-
-  const CustomDialog({
-    super.key,
-    required this.title,
-    required this.subTitle,
-    this.button1Text,
-    this.button2Text,
-    this.onButton1Tap,
-    this.onButton2Tap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.white,
-      alignment: Alignment.center,
-      title: Center(child: Text(title)),
-      titleTextStyle: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
-        fontSize: 18.sp,
-        height: 1.22,
-        leadingDistribution: TextLeadingDistribution.even,
-        letterSpacing: -0.48,
-      ),
-      titlePadding: EdgeInsets.only(top: 20.w, bottom: 10.w),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            subTitle,
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 30.w),
-          Row(
-            children: [
-              if (button1Text != null)
-                _buildButton(
-                  title: button1Text!,
-                  color: colorF1F2F7,
-                  textColor: color999DAC,
-                  onTap: () {
-                    if (onButton1Tap == null) {
-                      context.pop();
-                      return;
-                    }
-
-                    onButton1Tap!();
-                  },
-                ),
-              _buildButton(
-                title: button2Text ?? "완료",
-                onTap: () {
-                  if (onButton2Tap == null) {
-                    context.pop();
-                    return;
-                  }
-
-                  onButton2Tap!();
-                },
-              ),
-            ],
-          )
-        ],
-      ),
-      contentTextStyle: TextStyle(
-        color: color999DAC,
-        fontWeight: FontWeight.w400,
-        fontSize: 16.sp,
-        height: 1.5,
-        leadingDistribution: TextLeadingDistribution.even,
-        letterSpacing: -0.48,
-      ),
-      contentPadding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.w),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-    );
-  }
-
-  Widget _buildButton({
-    required String title,
-    Color color = color233067,
-    Color textColor = Colors.white,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 48.w,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(100)),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 16.sp,
-              letterSpacing: -0.48,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-void showCustomDialog({
-  required String title,
-  required String subTitle,
-  String? button1Text,
-  String? button2Text,
-  VoidCallback? onButton1Tap,
-  VoidCallback? onButton2Tap,
-}) {
-  showDialog(
-    context: rootContext!,
-    builder: (_) => CustomDialog(
-      title: title,
-      subTitle: subTitle,
-      button1Text: button1Text,
-      button2Text: button2Text,
-      onButton1Tap: onButton1Tap,
-      onButton2Tap: onButton2Tap,
-    ),
-  );
-}
-
 class BottomSheetFrame extends StatelessWidget {
   final Widget child;
   final String? title;
@@ -307,6 +183,7 @@ class BottomSheetFrame extends StatelessWidget {
       ),
       child: SafeArea(
         minimum: EdgeInsets.only(bottom: 16.w),
+        maintainBottomViewPadding: true,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: height ?? 514.w),
           child: Stack(
@@ -534,48 +411,4 @@ class OutlinedBorderActionButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class ToastWidget extends StatelessWidget {
-  final String message;
-
-  const ToastWidget({
-    super.key,
-    required this.message,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 20.w,
-        vertical: 12.w,
-      ),
-      decoration: BoxDecoration(color: color999DAC.withOpacity(0.75), borderRadius: BorderRadius.circular(20)),
-      child: Text(
-        message,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w500,
-          height: 1,
-          leadingDistribution: TextLeadingDistribution.even,
-        ),
-      ),
-    );
-  }
-}
-
-void showToast({required String message}) {
-  final fToast = FToast();
-
-  final context = rootContext;
-
-  if (context == null) return;
-
-  fToast.init(context);
-
-  fToast.showToast(
-    child: ToastWidget(message: message),
-  );
 }

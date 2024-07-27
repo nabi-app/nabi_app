@@ -1,7 +1,6 @@
 import 'dart:io';
-
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:nabi_app/utils/ui/components/custom_widget.dart';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<bool> requestPhotoPermission() async {

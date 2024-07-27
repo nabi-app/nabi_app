@@ -1,25 +1,46 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:nabi_app/enum/diary_type.dart';
+import 'package:nabi_app/presentaion/diary/components/diary_write_components.dart';
 import 'package:nabi_app/presentaion/diary/diary_write_view_model.dart';
 import 'package:nabi_app/utils/permission_request.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
+import 'package:nabi_app/utils/ui/components/custom_dialog.dart';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/components/nabi_calendar.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 
-import 'components/diary_write_components.dart';
-
-class DiaryWriteView extends StatelessWidget {
+class DiaryWriteView extends StatefulWidget {
   const DiaryWriteView({super.key});
 
   static const String path = "/diary-write";
   static const String name = "DiaryWriteView";
+
+  @override
+  State<DiaryWriteView> createState() => _DiaryWriteViewState();
+}
+
+class _DiaryWriteViewState extends State<DiaryWriteView> {
+  final FocusNode _focusNode = FocusNode();
+  final PlayerController _playerController = PlayerController();
+
+  DiaryWriteViewModel get _viewModel => context.read<DiaryWriteViewModel>();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _playerController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,40 +49,91 @@ class DiaryWriteView extends StatelessWidget {
       appBar: AppBar(
         actions: _actions,
       ),
-      body: KeyboardVisibilityBuilder(builder: (_, isKeyboardVisible) {
-        return Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Selector<DiaryWriteViewModel, bool>(
+        selector: (_, viewModel) => viewModel.isLoading,
+        builder: (_, isLoading, __) => isLoading
+            ? const CustomProgressIndicator()
+            : KeyboardVisibilityBuilder(
+                builder: (_, isKeyboardVisible) => Column(
                   children: [
-                    SizedBox(height: 30.w),
-                    _buildDateText(),
-                    _buildHashTags(),
-                    _buildRecordPlayer(),
-                    _buildImages(),
-                    SizedBox(height: 24.w),
-                    _buildTextField(context),
-                    SizedBox(height: 24.w),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(height: 30.w),
+                            _buildDateText(),
+                            _buildHashTags(),
+                            _buildImages(),
+                            _buildAudioPlayer(),
+                            SizedBox(height: 24.w),
+                            _buildTextField(),
+                            SizedBox(height: 24.w),
+                          ],
+                        ),
+                      ),
+                    ),
+                    isKeyboardVisible ? _buildEditingBar() : _buildNabiDivider(),
                   ],
                 ),
               ),
-            ),
-            isKeyboardVisible ? _buildEditingBar(context) : _buildNabiDivider(),
-          ],
-        );
-      }),
+      ),
     );
   }
 
   List<Widget> get _actions {
+    final viewType = context.select<DiaryWriteViewModel, DiaryWriteViewType>(
+      (viewModel) => viewModel.viewType,
+    );
+
+    if (viewType == DiaryWriteViewType.edit) {
+      return [
+        OutlinedBorderActionButton(
+          text: "저장하기",
+          onTap: () {
+            _viewModel.onViewTypeChanged(DiaryWriteViewType.readOnly);
+          },
+        ),
+      ];
+    }
+
+    if (viewType == DiaryWriteViewType.readOnly) {
+      return [
+        OutlinedBorderActionButton(
+          text: "수정하기",
+          activeColor: Colors.black,
+          margin: EdgeInsets.only(right: 10.w),
+          onTap: () => _viewModel.onViewTypeChanged(DiaryWriteViewType.edit),
+        ),
+        OutlinedBorderActionButton(
+          text: "삭제",
+          activeColor: Colors.black,
+          onTap: () => showCustomDialog(
+            title: "삭제 할까요?",
+            subTitle: "열심히 남긴 기억의 조각들이 없어집니다.\n그래도 삭제 할까요?",
+            button1Text: "아니요",
+            button2Text: "삭제하기",
+            onButton2Tap: () => _viewModel.deleteDiary().then(
+              (result) {
+                if (!result) return;
+
+                context.pop();
+              },
+            ),
+          ),
+        ),
+      ];
+    }
+
     return [
       Selector<DiaryWriteViewModel, String>(
         selector: (_, viewModel) => viewModel.content,
         builder: (_, content, __) => OutlinedBorderActionButton(
           text: "쓰기 완료",
-          onTap: content.isEmpty ? null : () {},
+          onTap: content.isEmpty ? null : () {
+            _focusNode.unfocus();
+            _viewModel.writeDiary();
+          },
         ),
       ),
     ];
@@ -119,14 +191,15 @@ class DiaryWriteView extends StatelessWidget {
     );
   }
 
-  Widget _buildRecordPlayer() {
+  Widget _buildAudioPlayer() {
     return Selector<DiaryWriteViewModel, File?>(
       selector: (_, viewModel) => viewModel.recordFile,
       builder: (context, file, __) => file == null
           ? const SizedBox.shrink()
           : AudioPlayer(
+              playerController: _playerController,
               file: file,
-              onDeleteTap: context.read<DiaryWriteViewModel>().deleteRecordFile,
+              onDeleteTap: _viewModel.deleteRecordFile,
             ),
     );
   }
@@ -138,37 +211,41 @@ class DiaryWriteView extends StatelessWidget {
           ? const SizedBox.shrink()
           : ImageCarouselSlider(
               images: images,
-              removeImage: context.read<DiaryWriteViewModel>().removeImage,
+              removeImage: _viewModel.viewType == DiaryWriteViewType.readOnly ? null : _viewModel.removeImage,
             ),
     );
   }
 
-  Widget _buildTextField(BuildContext context) {
-    return CustomTextField(
-      initialText: context.read<DiaryWriteViewModel>().content,
-      autoFocus: true,
-      scrollPhysics: const NeverScrollableScrollPhysics(),
-      hintText: "일기 내용을 적어주세요.",
-      hintStyle: TextStyle(
-        color: colorC6C8CF,
-        fontWeight: FontWeight.w400,
-        fontSize: 16.sp,
-        height: 1.5,
-        leadingDistribution: TextLeadingDistribution.even,
+  Widget _buildTextField() {
+    return IgnorePointer(
+      ignoring: _viewModel.viewType == DiaryWriteViewType.readOnly,
+      child: CustomTextField(
+        focusNode: _focusNode,
+        initialText: _viewModel.content,
+        autoFocus: _viewModel.viewType == DiaryWriteViewType.create,
+        scrollPhysics: const NeverScrollableScrollPhysics(),
+        hintText: "일기 내용을 적어주세요.",
+        hintStyle: TextStyle(
+          color: colorC6C8CF,
+          fontWeight: FontWeight.w400,
+          fontSize: 16.sp,
+          height: 1.5,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
+        style: TextStyle(
+          fontWeight: FontWeight.w400,
+          fontSize: 16.sp,
+          height: 1.5,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
+        maxLength: 1000,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        onChanged: _viewModel.onContentChanged,
       ),
-      style: TextStyle(
-        fontWeight: FontWeight.w400,
-        fontSize: 16.sp,
-        height: 1.5,
-        leadingDistribution: TextLeadingDistribution.even,
-      ),
-      maxLength: 1000,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-      onChanged: context.read<DiaryWriteViewModel>().onContentChanged,
     );
   }
 
-  Widget _buildEditingBar(BuildContext context) {
+  Widget _buildEditingBar() {
     return Container(
       height: 52.w,
       decoration: const BoxDecoration(
@@ -185,14 +262,14 @@ class DiaryWriteView extends StatelessWidget {
               width: 28.w,
               height: 28.w,
             ),
-            onTap: () => _onAlbumTap(context),
+            onTap: () => _onAlbumTap(),
           ),
           _buildEditingMenuButton(
             icon: Assets.svg.iconMic.svg(
               width: 28.w,
               height: 28.w,
             ),
-            onTap: () => _onRecordTap(context),
+            onTap: () => _onRecordTap(),
           ),
           _buildEditingMenuButton(
             icon: Assets.svg.iconCalendar.svg(
@@ -203,14 +280,14 @@ class DiaryWriteView extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            onTap: () => _onCalendarTap(context),
+            onTap: () => _onCalendarTap(),
           ),
           _buildEditingMenuButton(
             icon: Assets.svg.iconTag.svg(
               width: 28.w,
               height: 28.w,
             ),
-            onTap: () => _onHashTagTap(context),
+            onTap: () => _onHashTagTap(),
           ),
         ],
       ),
@@ -263,31 +340,40 @@ class DiaryWriteView extends StatelessWidget {
     );
   }
 
-  Future<void> _onAlbumTap(BuildContext context) async {
-    // _focusNode.unfocus();
-
-    final viewModel = context.read<DiaryWriteViewModel>();
-
+  Future<void> _onAlbumTap() async {
     final isPermissionGranted = await requestPhotoPermission();
 
     if (!isPermissionGranted) return;
 
     try {
+      if (_viewModel.images.length == 3) {
+        showToast(
+          message: "이미지는 최대 3개까지 첨부할 수 있어요.",
+          bottomPadding: 16.w,
+        );
+        return;
+      }
+
+      _focusNode.unfocus();
+
       final image = await ImagePicker().pickImage(
         source: ImageSource.gallery,
         requestFullMetadata: false,
       );
 
-      viewModel.addImage(image);
-
-      // _focusNode.requestFocus();
+      _viewModel.addImage(image);
     } catch (e) {
-      showToast(message: "이미지를 불러오는데 실패했습니다.");
+      showToast(
+        message: "이미지를 불러오는데 실패했습니다.",
+        bottomPadding: 16.w,
+      );
+    } finally {
+      _focusNode.requestFocus();
     }
   }
 
-  Future<void> _onRecordTap(BuildContext context) async {
-    final viewModel = context.read<DiaryWriteViewModel>();
+  Future<void> _onRecordTap() async {
+    _playerController.pausePlayer();
 
     final result = await showModalBottomSheet<File>(
       context: context,
@@ -295,32 +381,28 @@ class DiaryWriteView extends StatelessWidget {
       builder: (_) => const VoiceRecordBottomSheet(),
     );
 
-    viewModel.onRecordFileChanged(result);
+    _viewModel.onRecordFileChanged(result);
   }
 
-  Future<void> _onCalendarTap(BuildContext context) async {
-    final viewModel = context.read<DiaryWriteViewModel>();
-
+  Future<void> _onCalendarTap() async {
     final result = await showCalendarBottomSheet(
       context,
-      selectedDay: viewModel.date,
+      selectedDay: _viewModel.date,
       title: "날짜 재설정 하기",
     );
 
-    viewModel.onDateChanged(result);
+    _viewModel.onDateChanged(result);
   }
 
-  Future<void> _onHashTagTap(BuildContext context) async {
-    final viewModel = context.read<DiaryWriteViewModel>();
-
+  Future<void> _onHashTagTap() async {
     final result = await showModalBottomSheet<List<String>>(
       context: context,
       isScrollControlled: true,
       builder: (_) => HashTagBottomSheet(
-        hashTags: viewModel.hashTags,
+        hashTags: _viewModel.hashTags,
       ),
     );
 
-    viewModel.onHashTagsChanged(result);
+    _viewModel.onHashTagsChanged(result);
   }
 }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabi_app/domain/model/diary_list_response.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nabi_app/domain/model/diary_item_data.dart';
 import 'package:nabi_app/enum/diary_type.dart';
 import 'package:nabi_app/presentaion/diary/components/diary_components.dart';
 import 'package:nabi_app/presentaion/diary/diary_page_view_model.dart';
+import 'package:nabi_app/presentaion/diary/diary_write_view.dart';
 import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/utils/throttle.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
+import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -143,13 +146,7 @@ class _DiaryPageState extends State<DiaryPage> {
     return Selector<DiaryPageViewModel, List<DiaryItemData>?>(
       selector: (_, viewModel) => viewModel.items,
       builder: (_, items, __) => items == null
-          ? const Align(
-              alignment: Alignment.topCenter,
-              child: RefreshProgressIndicator(
-                color: color233067,
-                backgroundColor: Colors.white,
-              ),
-            )
+          ? const CustomProgressIndicator()
           : items.isEmpty
               ? _buildEmptyMessage()
               : ListView.separated(
@@ -157,10 +154,14 @@ class _DiaryPageState extends State<DiaryPage> {
                   itemCount: items.length,
                   padding: EdgeInsets.fromLTRB(16.w, 16.w, 16.w, 20.w),
                   separatorBuilder: (_, __) => SizedBox(height: 20.w),
-                  itemBuilder: (_, index) => DiaryItemCard(
-                    item: items[index],
-                    onTap: () {},
-                  ),
+                  itemBuilder: (_, index) {
+                    final item = items[index];
+
+                    return DiaryItemCard(
+                      item: item,
+                      onTap: () => context.pushNamed(DiaryWriteView.name, extra: item),
+                    );
+                  },
                 ),
     );
   }

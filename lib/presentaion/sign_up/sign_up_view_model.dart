@@ -10,8 +10,8 @@ import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/permission_request.dart';
-import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 import 'package:provider/provider.dart';
 
 @injectable
@@ -90,7 +90,7 @@ class SignUpViewModel extends ChangeNotifier {
       _passNicknameDuplicationCheck = bool.parse(result);
       notifyListeners();
     } catch (e) {
-      showToast(message: "잠시 후에 다시 시도해주세요.");
+      showCommonErrorToast();
     }
   }
 

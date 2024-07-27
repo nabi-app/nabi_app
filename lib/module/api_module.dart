@@ -9,7 +9,7 @@ import 'package:nabi_app/domain/repository/user_auth_repository.dart';
 import 'package:nabi_app/router/router_config.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/constants.dart';
-import 'package:nabi_app/utils/ui/components/custom_widget.dart';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 import 'package:nabi_app/utils/logger.dart';
 import 'package:provider/provider.dart';
 

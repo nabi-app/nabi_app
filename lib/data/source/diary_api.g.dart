@@ -47,6 +47,90 @@ class _DiaryApi implements DiaryApi {
     return value;
   }
 
+  @override
+  Future<DiaryWriteResponse> writeDiary({
+    required String date,
+    required String content,
+    required List<String> hashTags,
+    required List<File> images,
+    File? recordFile,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.fields.add(MapEntry(
+      'date',
+      date,
+    ));
+    _data.fields.add(MapEntry(
+      'desc',
+      content,
+    ));
+    hashTags.forEach((i) {
+      _data.fields.add(MapEntry('tags', i));
+    });
+    _data.files.addAll(images.map((i) => MapEntry(
+        'image_files',
+        MultipartFile.fromFileSync(
+          i.path,
+          filename: i.path.split(Platform.pathSeparator).last,
+        ))));
+    if (recordFile != null) {
+      _data.files.add(MapEntry(
+        'record_file',
+        MultipartFile.fromFileSync(
+          recordFile.path,
+          filename: recordFile.path.split(Platform.pathSeparator).last,
+        ),
+      ));
+    }
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<DiaryWriteResponse>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/diary/write',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = DiaryWriteResponse.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<void> deleteDiary({required int diaryId}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    await _dio.fetch<void>(_setStreamType<void>(Options(
+      method: 'DELETE',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          '/diary/${diaryId}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        ))));
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

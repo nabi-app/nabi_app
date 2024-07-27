@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nabi_app/domain/model/diary_item_data.dart';
 
 part 'diary_list_response.freezed.dart';
 part 'diary_list_response.g.dart';
@@ -11,24 +12,6 @@ class DiaryListResponse with _$DiaryListResponse {
   }) = _DiaryListResponse;
 
   factory DiaryListResponse.fromJson(Map<String, dynamic> json) => _$DiaryListResponseFromJson(json);
-}
-
-@freezed
-class DiaryItemData with _$DiaryItemData {
-	factory DiaryItemData({
-    required DateTime createdAt,
-    required DateTime? updatedAt,
-    required DateTime? deletedAt,
-    required int diaryId,
-    List<String>? images,
-    List<String>? tags,
-    List<String>? records,
-    required DateTime date,
-    @JsonKey(name: "desc") required String description,
-    required int userId,
-  }) = _DiaryItemData;
-
-	factory DiaryItemData.fromJson(Map<String, dynamic> json) => _$DiaryItemDataFromJson(json);
 }
 
 @freezed

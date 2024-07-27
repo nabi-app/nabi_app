@@ -1,20 +1,26 @@
+import 'dart:async';
+
+import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:nabi_app/di/di_setup.dart';
 import 'package:nabi_app/domain/model/diary_list_request.dart';
-import 'package:nabi_app/domain/model/diary_list_response.dart';
+import 'package:nabi_app/domain/model/diary_item_data.dart';
 import 'package:nabi_app/domain/repository/diary_repository.dart';
 import 'package:nabi_app/enum/diary_type.dart';
-import 'package:nabi_app/utils/ui/components/custom_widget.dart';
+import 'package:nabi_app/module/event_module.dart';
+import 'package:nabi_app/utils/ui/components/custom_toast.dart';
 
 @injectable
 class DiaryPageViewModel extends ChangeNotifier {
   final DiaryRepository _repository;
 
   DiaryPageViewModel(this._repository) {
+    _initEventBus();
     fetch();
   }
 
-  DiaryListOrderType _orderType = DiaryListOrderType.asc;
+  DiaryListOrderType _orderType = DiaryListOrderType.desc;
 
   DiaryListOrderType get orderType => _orderType;
 
@@ -42,6 +48,20 @@ class DiaryPageViewModel extends ChangeNotifier {
 
   bool _hasMore = true;
 
+  late final StreamSubscription<DiaryListRefreshEvent> _eventSubscription;
+
+  void _initEventBus() {
+    _eventSubscription = getIt<EventBus>().on<DiaryListRefreshEvent>().listen(
+          (_) => _refresh(),
+        );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _eventSubscription.cancel();
+  }
+
   Future<void> fetch() async {
     try {
       if (!_hasMore) return;
@@ -68,7 +88,7 @@ class DiaryPageViewModel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      showToast(message: "잠시 후 다시 시도해주세요.");
+      showCommonErrorToast();
     }
   }
 
