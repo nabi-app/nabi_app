@@ -27,6 +27,18 @@ abstract class DiaryApi {
     @Part(name: "record_file") File? recordFile,
   });
 
+  @POST("/diary/update/{id}")
+  Future<DiaryWriteResponse> updateDiary({
+    @Path("id") required int diaryId,
+    @Part() required String date,
+    @Part(name: "desc") required String content,
+    @Part(name: "tags") required List<String> hashTags,
+    @Part(name: "images") required List<String> updatedImages,
+    @Part(name: "records") required List<String> updatedRecord,
+    @Part(name: "image_files") required List<File> images,
+    @Part(name: "record_file") File? recordFile,
+  });
+
   @DELETE("/diary/{id}")
   Future<void> deleteDiary({
     @Path("id") required int diaryId,

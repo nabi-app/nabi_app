@@ -11,7 +11,7 @@ class NabiCustomView extends StatelessWidget {
   const NabiCustomView({super.key});
 
   static const String path = "/nabi-custom";
-  static const String name = "nabiCustom";
+  static const String name = "NabiCustomView";
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,7 @@ class NabiCustomView extends StatelessWidget {
   }) {
     return AlertDialog(
       backgroundColor: colorFFFBE4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.w)),
       insetPadding: EdgeInsets.symmetric(horizontal: 48.w),
       contentPadding: EdgeInsets.all(20.w),
       content: Column(
@@ -349,7 +349,7 @@ class NabiCustomView extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(7.w),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.w),
             border: selected
                 ? Border.all(
                     color: Colors.black,
@@ -368,7 +368,7 @@ class NabiCustomView extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(color: color.borderColor),
                     color: color.innerColor,
-                    borderRadius: BorderRadius.circular(7),
+                    borderRadius: BorderRadius.circular(7.w),
                   ),
                 ),
               ),

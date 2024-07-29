@@ -124,10 +124,15 @@ class GoalWriteView extends StatelessWidget {
                         leadingDistribution: TextLeadingDistribution.even,
                       ),
                     )
-                  : _OutlinedInfoContainer(
+                  : OutlinedInfoContainer(
                       onClearTap: context.read<GoalWriteViewModel>().clearGoalDay,
                       prefixIcon: Assets.svg.iconCalendar.svg(
-                        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                        width: 20.w,
+                        height: 20.w,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       content: DateFormat("yyyy년 M월 d일").format(goalDay),
                     ),
@@ -168,10 +173,15 @@ class GoalWriteView extends StatelessWidget {
                         leadingDistribution: TextLeadingDistribution.even,
                       ),
                     )
-                  : _OutlinedInfoContainer(
+                  : OutlinedInfoContainer(
                       onClearTap: context.read<GoalWriteViewModel>().clearNotificationTime,
                       prefixIcon: Assets.svg.iconClock.svg(
-                        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                        width: 20.w,
+                        height: 20.w,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       content: viewModel.notificationTimeText,
                     ),
@@ -211,7 +221,7 @@ class GoalWriteView extends StatelessWidget {
       itemBuilder: (context, index) {
         final todo = todoList[index];
 
-        return _TodoItem(
+        return TodoItem(
           content: todo.content,
           complete: todo.complete,
           onCheck: () => context.read<GoalWriteViewModel>().checkTodo(index),
@@ -287,163 +297,6 @@ class GoalWriteView extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => _TodoTextField(content: content),
-    );
-  }
-}
-
-class _OutlinedInfoContainer extends StatelessWidget {
-  final VoidCallback onClearTap;
-  final Widget prefixIcon;
-  final String content;
-
-  const _OutlinedInfoContainer({
-    required this.onClearTap,
-    required this.prefixIcon,
-    required this.content,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 36.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: colorA6A7AC),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: 7.w,
-              right: 4.w,
-            ),
-            child: prefixIcon,
-          ),
-          Text(
-            content,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: 16.sp,
-              height: 1.25,
-              leadingDistribution: TextLeadingDistribution.even,
-              letterSpacing: -0.48,
-            ),
-          ),
-          GestureDetector(
-            onTap: onClearTap,
-            behavior: HitTestBehavior.translucent,
-            child: Padding(
-              padding: EdgeInsets.only(left: 20.w, right: 7.w),
-              child: Assets.svg.iconClose.svg(
-                width: 10.w,
-                height: 10.w,
-                colorFilter: const ColorFilter.mode(
-                  Colors.black,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TodoItem extends StatelessWidget {
-  final String content;
-  final bool complete;
-  final VoidCallback onCheck;
-  final VoidCallback onTap;
-
-  const _TodoItem({
-    required this.content,
-    required this.complete,
-    required this.onCheck,
-    required this.onTap,
-  });
-
-  TextStyle get _baseTextStyle => TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-        fontSize: 14.sp,
-        height: 1.42,
-        leadingDistribution: TextLeadingDistribution.even,
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.only(right: 10.w),
-        decoration: BoxDecoration(
-          color: colorF1F2F7,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: complete ? _buildCompleteChild() : _buildIncompleteChild(),
-      ),
-    );
-  }
-
-  Widget _buildCompleteChild() {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: onCheck,
-          behavior: HitTestBehavior.translucent,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.w),
-            child: Assets.svg.iconCheck.svg(
-              width: 14.w,
-              height: 14.w,
-            ),
-          ),
-        ),
-        Flexible(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.w),
-            child: Text(
-              content,
-              style: _baseTextStyle.copyWith(
-                color: color999DAC,
-                decoration: TextDecoration.lineThrough,
-                decorationColor: color999DAC,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIncompleteChild() {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: onCheck,
-          behavior: HitTestBehavior.translucent,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.w),
-            child: Assets.svg.iconCircleEmpty.svg(
-              width: 14.w,
-              height: 14.w,
-              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-            ),
-          ),
-        ),
-        Flexible(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.w),
-            child: Text(
-              content,
-              style: _baseTextStyle,
-            ),
-          ),
-        )
-      ],
     );
   }
 }

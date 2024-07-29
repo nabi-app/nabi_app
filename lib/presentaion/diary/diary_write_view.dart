@@ -91,7 +91,8 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
         OutlinedBorderActionButton(
           text: "저장하기",
           onTap: () {
-            _viewModel.onViewTypeChanged(DiaryWriteViewType.readOnly);
+            _focusNode.unfocus();
+            _viewModel.updateDiary();
           },
         ),
       ];
@@ -103,7 +104,10 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
           text: "수정하기",
           activeColor: Colors.black,
           margin: EdgeInsets.only(right: 10.w),
-          onTap: () => _viewModel.onViewTypeChanged(DiaryWriteViewType.edit),
+          onTap: () {
+            _focusNode.requestFocus();
+            _viewModel.onViewTypeChanged(DiaryWriteViewType.edit);
+          },
         ),
         OutlinedBorderActionButton(
           text: "삭제",
@@ -199,7 +203,7 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
           : AudioPlayer(
               playerController: _playerController,
               file: file,
-              onDeleteTap: _viewModel.deleteRecordFile,
+              onDeleteTap: _viewModel.viewType == DiaryWriteViewType.readOnly ? null : _viewModel.deleteRecordFile,
             ),
     );
   }
@@ -378,6 +382,7 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
     final result = await showModalBottomSheet<File>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => const VoiceRecordBottomSheet(),
     );
 
@@ -398,6 +403,7 @@ class _DiaryWriteViewState extends State<DiaryWriteView> {
     final result = await showModalBottomSheet<List<String>>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => HashTagBottomSheet(
         hashTags: _viewModel.hashTags,
       ),

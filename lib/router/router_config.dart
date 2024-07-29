@@ -18,6 +18,10 @@ import 'package:nabi_app/presentaion/login/login_view.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_page.dart';
 import 'package:nabi_app/presentaion/main/main_view.dart';
+import 'package:nabi_app/presentaion/music_recommend/music_recommend_page.dart';
+import 'package:nabi_app/presentaion/music_recommend/music_recommend_page_view_model.dart';
+import 'package:nabi_app/presentaion/nabi_collection/nabi_collection_page.dart';
+import 'package:nabi_app/presentaion/nabi_collection/nabi_collection_page_view_model.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_view_model.dart';
@@ -91,6 +95,34 @@ final GoRouter routerConfig = GoRouter(
             ),
           ],
         ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: NabiCollectionPage.path,
+              name: NabiCollectionPage.name,
+              pageBuilder: (_, __) => NoTransitionPage(
+                child: ChangeNotifierProvider(
+                  create: (_) => getIt<NabiCollectionPageViewModel>(),
+                  builder: (_, __) => const NabiCollectionPage(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: MusicRecommendPage.path,
+              name: MusicRecommendPage.name,
+              pageBuilder: (_, __) => NoTransitionPage(
+                child: ChangeNotifierProvider(
+                  create: (_) => getIt<MusicRecommendPageViewModel>(),
+                  builder: (_, __) => const MusicRecommendPage(),
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     ),
     GoRoute(
@@ -110,19 +142,20 @@ final GoRouter routerConfig = GoRouter(
       ),
     ),
     GoRoute(
-        path: DiaryWriteView.path,
-        name: DiaryWriteView.name,
-        builder: (_, state) => ChangeNotifierProvider(
-              create: (_) => getIt<DiaryWriteViewModel>(param1: state.extra as DiaryItemData?),
-              builder: (_, __) => const DiaryWriteView(),
-            ),
-        routes: [
-          GoRoute(
-            path: DiaryWriteImageDetailView.path,
-            name: DiaryWriteImageDetailView.name,
-            builder: (_, state) => DiaryWriteImageDetailView(args: state.extra as ({List<File> images, int index})),
-          ),
-        ]),
+      path: DiaryWriteView.path,
+      name: DiaryWriteView.name,
+      builder: (_, state) => ChangeNotifierProvider(
+        create: (_) => getIt<DiaryWriteViewModel>(param1: state.extra as DiaryItemData?),
+        builder: (_, __) => const DiaryWriteView(),
+      ),
+      routes: [
+        GoRoute(
+          path: DiaryWriteImageDetailView.path,
+          name: DiaryWriteImageDetailView.name,
+          builder: (_, state) => DiaryWriteImageDetailView(args: state.extra as ({List<File> images, int index})),
+        ),
+      ],
+    ),
   ],
   refreshListenable: getIt<AuthProvider>(),
   redirect: getIt<AuthProvider>().redirection,

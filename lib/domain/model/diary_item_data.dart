@@ -13,11 +13,16 @@ class DiaryItemData with _$DiaryItemData {
     required int diaryId,
     List<String>? images,
     List<String>? tags,
-    List<String>? records,
+    @JsonKey(name: "records", fromJson: _processRecordUrl)
+    String? record,
     required DateTime date,
     @JsonKey(name: "desc") required String content,
     required int userId,
   }) = _DiaryItemData;
 
   factory DiaryItemData.fromJson(Map<String, dynamic> json) => _$DiaryItemDataFromJson(json);
+}
+
+String? _processRecordUrl(List<dynamic>? records) {
+  return records?.firstOrNull;
 }

@@ -271,6 +271,7 @@ Future<DateTime?> showCalendarBottomSheet(
   return showModalBottomSheet<DateTime>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.white,
     builder: (_) => NabiCalendarBottomSheet(
       title: title,

@@ -41,7 +41,7 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
     return Container(
       margin: EdgeInsets.only(top: 10.w, left: 16.w, right: 16.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.w),
         color: colorF6F6F6,
       ),
       child: Stack(
@@ -56,7 +56,7 @@ class _ImageCarouselSliderState extends State<ImageCarouselSlider> {
 
   Widget _buildImageSlider(List<File> images) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(12.w),
       child: CarouselSlider.builder(
         itemCount: images.length,
         options: CarouselOptions(
@@ -274,7 +274,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
       ),
       decoration: BoxDecoration(
         color: colorE5EAF7,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.w),
       ),
       playerController: _playerController,
       waveformData: _waveFormData ?? [],
