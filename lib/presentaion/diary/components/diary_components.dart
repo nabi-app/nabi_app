@@ -27,7 +27,7 @@ class DiaryItemCard extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(14.w, 14.w, 14.w, 20.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.w),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.12),
@@ -67,7 +67,7 @@ class DiaryItemCard extends StatelessWidget {
       height: 168.w,
       margin: EdgeInsets.only(bottom: 14.w),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.w),
           image: DecorationImage(image: NetworkImage(item.images!.first), fit: BoxFit.cover)),
     );
   }
@@ -101,7 +101,7 @@ class DiaryItemCard extends StatelessWidget {
           ),
           SizedBox(width: 6.w),
         ],
-        if (item.records?.isNotEmpty ?? false) ...[
+        if (item.record != null) ...[
           _buildHashTag(
             Assets.svg.iconMic.svg(
               width: 14.w,
@@ -135,7 +135,7 @@ class DiaryItemCard extends StatelessWidget {
       height: 20.w,
       decoration: BoxDecoration(
         color: colorF1F2F7,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.w),
       ),
       alignment: Alignment.center,
       child: icon,

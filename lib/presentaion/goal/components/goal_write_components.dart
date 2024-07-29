@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nabi_app/enum/notification_time_type.dart';
+import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/components/custom_widget.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 
@@ -173,4 +174,101 @@ class _NotificationTimeSelectionBottomSheetState extends State<NotificationTimeS
   }
 
   NotificationTime _calculateTime() => (type: _timeType!, hour: _hour!, minute: _minute!);
+}
+
+class TodoItem extends StatelessWidget {
+  final String content;
+  final bool complete;
+  final VoidCallback? onCheck;
+  final VoidCallback? onTap;
+
+  const TodoItem({
+    super.key,
+    required this.content,
+    required this.complete,
+    this.onCheck,
+    this.onTap,
+  });
+
+  TextStyle get _baseTextStyle => TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w500,
+    fontSize: 14.sp,
+    height: 1.42,
+    leadingDistribution: TextLeadingDistribution.even,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.only(right: 10.w),
+        decoration: BoxDecoration(
+          color: colorF1F2F7,
+          borderRadius: BorderRadius.circular(6.w),
+        ),
+        child: complete ? _buildCompleteChild() : _buildIncompleteChild(),
+      ),
+    );
+  }
+
+  Widget _buildCompleteChild() {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onCheck,
+          behavior: HitTestBehavior.translucent,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.w),
+            child: Assets.svg.iconCheck.svg(
+              width: 14.w,
+              height: 14.w,
+            ),
+          ),
+        ),
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.w),
+            child: Text(
+              content,
+              style: _baseTextStyle.copyWith(
+                color: color999DAC,
+                decoration: TextDecoration.lineThrough,
+                decorationColor: color999DAC,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncompleteChild() {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onCheck,
+          behavior: HitTestBehavior.translucent,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.w),
+            child: Assets.svg.iconCircleEmpty.svg(
+              width: 14.w,
+              height: 14.w,
+              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            ),
+          ),
+        ),
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.w),
+            child: Text(
+              content,
+              style: _baseTextStyle,
+            ),
+          ),
+        )
+      ],
+    );
+  }
 }

@@ -90,7 +90,7 @@ class _CustomDialog extends StatelessWidget {
       ),
       contentPadding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.w),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.w),
       ),
     );
   }

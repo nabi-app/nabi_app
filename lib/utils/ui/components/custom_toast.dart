@@ -23,7 +23,10 @@ class _ToastWidget extends StatelessWidget {
         horizontal: 20.w,
         vertical: 12.w,
       ),
-      decoration: BoxDecoration(color: color999DAC.withOpacity(0.75), borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+        color: color999DAC.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(20.w),
+      ),
       child: Text(
         message,
         style: TextStyle(

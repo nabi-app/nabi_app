@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nabi_app/utils/ui/assets.gen.dart';
 import 'package:nabi_app/utils/ui/ui_theme.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
@@ -408,6 +409,65 @@ class OutlinedBorderActionButton extends StatelessWidget {
             leadingDistribution: TextLeadingDistribution.even,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class OutlinedInfoContainer extends StatelessWidget {
+  final VoidCallback? onClearTap;
+  final Widget prefixIcon;
+  final String content;
+
+  const OutlinedInfoContainer({
+    super.key,
+    this.onClearTap,
+    required this.prefixIcon,
+    required this.content,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36.w,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6.w),
+        border: Border.all(color: colorA6A7AC),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 7.w),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          prefixIcon,
+          SizedBox(width: 4.w),
+          Text(
+            content,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 16.sp,
+              height: 1.25,
+              leadingDistribution: TextLeadingDistribution.even,
+              letterSpacing: -0.48,
+            ),
+          ),
+          if (onClearTap != null)
+            GestureDetector(
+              onTap: onClearTap,
+              behavior: HitTestBehavior.translucent,
+              child: Padding(
+                padding: EdgeInsets.only(left: 20.w),
+                child: Assets.svg.iconClose.svg(
+                  width: 10.w,
+                  height: 10.w,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.black,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

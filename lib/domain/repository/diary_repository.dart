@@ -15,5 +15,16 @@ abstract interface class DiaryRepository {
     required File? recordFile,
   });
 
+  Future<DiaryWriteResponse> updateDiary({
+    required int diaryId,
+    required DateTime date,
+    required String content,
+    required List<String> hashTags,
+    required List<String> updatedImages,
+    required String? updatedRecord,
+    required List<File> images,
+    required File? recordFile,
+  });
+
   Future<void> deleteDiary({required int diaryId});
 }

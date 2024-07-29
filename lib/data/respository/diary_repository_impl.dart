@@ -37,6 +37,28 @@ class DiaryRepositoryImpl implements DiaryRepository {
   }
 
   @override
+  Future<DiaryWriteResponse> updateDiary({
+    required int diaryId,
+    required DateTime date,
+    required String content,
+    required List<String> hashTags,
+    required List<String> updatedImages,
+    required String? updatedRecord,
+    required List<File> images,
+    required File? recordFile,
+  }) {
+    return _api.updateDiary(
+      diaryId: diaryId,
+      date: DateFormat("yyyy-MM-dd").format(date),
+      content: content,
+      hashTags: hashTags,
+      updatedImages: updatedImages,
+      updatedRecord: [if (updatedRecord != null) updatedRecord],
+      images: images,
+    );
+  }
+
+  @override
   Future<void> deleteDiary({required int diaryId}) {
     return _api.deleteDiary(diaryId: diaryId);
   }

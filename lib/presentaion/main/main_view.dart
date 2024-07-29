@@ -28,7 +28,12 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   final LayerLink _layerLink = LayerLink();
 
-  String get _titleText => widget.navigationShell.currentIndex == 0 ? "나의 목표" : "일기";
+  String get _titleText => switch(widget.navigationShell.currentIndex) {
+    0 => "나의 목표",
+    1 => "일기",
+    2 => "나비 컬렉션",
+    _ => "음악추천",
+  };
 
   @override
   void initState() {
@@ -101,7 +106,7 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   }
 
   Widget? _buildFloatingActionButton() {
-    if (widget.navigationShell.currentIndex != 0 && widget.navigationShell.currentIndex != 1) {
+    if (widget.navigationShell.currentIndex == 2) {
       return null;
     }
 
@@ -158,6 +163,14 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
             _buildBottomNavigationBarItem(
               onTap: () => widget.navigationShell.goBranch(1),
               isSelected: widget.navigationShell.currentIndex == 1,
+            ),
+            _buildBottomNavigationBarItem(
+              onTap: () => widget.navigationShell.goBranch(2),
+              isSelected: widget.navigationShell.currentIndex == 2,
+            ),
+            _buildBottomNavigationBarItem(
+              onTap: () => widget.navigationShell.goBranch(3),
+              isSelected: widget.navigationShell.currentIndex == 3,
             ),
           ],
         ),

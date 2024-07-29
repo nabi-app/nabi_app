@@ -1,0 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
+
+@injectable
+class NabiCollectionPageViewModel extends ChangeNotifier {
+
+}

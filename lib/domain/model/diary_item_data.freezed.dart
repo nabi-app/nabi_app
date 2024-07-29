@@ -26,7 +26,8 @@ mixin _$DiaryItemData {
   int get diaryId => throw _privateConstructorUsedError;
   List<String>? get images => throw _privateConstructorUsedError;
   List<String>? get tags => throw _privateConstructorUsedError;
-  List<String>? get records => throw _privateConstructorUsedError;
+  @JsonKey(name: "records", fromJson: _processRecordUrl)
+  String? get record => throw _privateConstructorUsedError;
   DateTime get date => throw _privateConstructorUsedError;
   @JsonKey(name: "desc")
   String get content => throw _privateConstructorUsedError;
@@ -51,7 +52,7 @@ abstract class $DiaryItemDataCopyWith<$Res> {
       int diaryId,
       List<String>? images,
       List<String>? tags,
-      List<String>? records,
+      @JsonKey(name: "records", fromJson: _processRecordUrl) String? record,
       DateTime date,
       @JsonKey(name: "desc") String content,
       int userId});
@@ -76,7 +77,7 @@ class _$DiaryItemDataCopyWithImpl<$Res, $Val extends DiaryItemData>
     Object? diaryId = null,
     Object? images = freezed,
     Object? tags = freezed,
-    Object? records = freezed,
+    Object? record = freezed,
     Object? date = null,
     Object? content = null,
     Object? userId = null,
@@ -106,10 +107,10 @@ class _$DiaryItemDataCopyWithImpl<$Res, $Val extends DiaryItemData>
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      records: freezed == records
-          ? _value.records
-          : records // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+      record: freezed == record
+          ? _value.record
+          : record // ignore: cast_nullable_to_non_nullable
+              as String?,
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -141,7 +142,7 @@ abstract class _$$DiaryItemDataImplCopyWith<$Res>
       int diaryId,
       List<String>? images,
       List<String>? tags,
-      List<String>? records,
+      @JsonKey(name: "records", fromJson: _processRecordUrl) String? record,
       DateTime date,
       @JsonKey(name: "desc") String content,
       int userId});
@@ -164,7 +165,7 @@ class __$$DiaryItemDataImplCopyWithImpl<$Res>
     Object? diaryId = null,
     Object? images = freezed,
     Object? tags = freezed,
-    Object? records = freezed,
+    Object? record = freezed,
     Object? date = null,
     Object? content = null,
     Object? userId = null,
@@ -194,10 +195,10 @@ class __$$DiaryItemDataImplCopyWithImpl<$Res>
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      records: freezed == records
-          ? _value._records
-          : records // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+      record: freezed == record
+          ? _value.record
+          : record // ignore: cast_nullable_to_non_nullable
+              as String?,
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -224,13 +225,12 @@ class _$DiaryItemDataImpl implements _DiaryItemData {
       required this.diaryId,
       final List<String>? images,
       final List<String>? tags,
-      final List<String>? records,
+      @JsonKey(name: "records", fromJson: _processRecordUrl) this.record,
       required this.date,
       @JsonKey(name: "desc") required this.content,
       required this.userId})
       : _images = images,
-        _tags = tags,
-        _records = records;
+        _tags = tags;
 
   factory _$DiaryItemDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$DiaryItemDataImplFromJson(json);
@@ -263,16 +263,9 @@ class _$DiaryItemDataImpl implements _DiaryItemData {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<String>? _records;
   @override
-  List<String>? get records {
-    final value = _records;
-    if (value == null) return null;
-    if (_records is EqualUnmodifiableListView) return _records;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
+  @JsonKey(name: "records", fromJson: _processRecordUrl)
+  final String? record;
   @override
   final DateTime date;
   @override
@@ -283,7 +276,7 @@ class _$DiaryItemDataImpl implements _DiaryItemData {
 
   @override
   String toString() {
-    return 'DiaryItemData(createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, diaryId: $diaryId, images: $images, tags: $tags, records: $records, date: $date, content: $content, userId: $userId)';
+    return 'DiaryItemData(createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, diaryId: $diaryId, images: $images, tags: $tags, record: $record, date: $date, content: $content, userId: $userId)';
   }
 
   @override
@@ -300,7 +293,7 @@ class _$DiaryItemDataImpl implements _DiaryItemData {
             (identical(other.diaryId, diaryId) || other.diaryId == diaryId) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
-            const DeepCollectionEquality().equals(other._records, _records) &&
+            (identical(other.record, record) || other.record == record) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.userId, userId) || other.userId == userId));
@@ -316,7 +309,7 @@ class _$DiaryItemDataImpl implements _DiaryItemData {
       diaryId,
       const DeepCollectionEquality().hash(_images),
       const DeepCollectionEquality().hash(_tags),
-      const DeepCollectionEquality().hash(_records),
+      record,
       date,
       content,
       userId);
@@ -343,7 +336,8 @@ abstract class _DiaryItemData implements DiaryItemData {
       required final int diaryId,
       final List<String>? images,
       final List<String>? tags,
-      final List<String>? records,
+      @JsonKey(name: "records", fromJson: _processRecordUrl)
+      final String? record,
       required final DateTime date,
       @JsonKey(name: "desc") required final String content,
       required final int userId}) = _$DiaryItemDataImpl;
@@ -364,7 +358,8 @@ abstract class _DiaryItemData implements DiaryItemData {
   @override
   List<String>? get tags;
   @override
-  List<String>? get records;
+  @JsonKey(name: "records", fromJson: _processRecordUrl)
+  String? get record;
   @override
   DateTime get date;
   @override
