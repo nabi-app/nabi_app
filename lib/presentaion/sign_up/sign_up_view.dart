@@ -74,15 +74,13 @@ class _SignUpViewState extends State<SignUpView> {
       ),
       leadingWidth: 68.w,
       titleSpacing: 0,
-      title: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          "회원가입하기",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: 16.sp,
-          ),
+      centerTitle: false,
+      title: Text(
+        "회원가입하기",
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
         ),
       ),
     );

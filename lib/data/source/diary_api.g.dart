@@ -113,14 +113,13 @@ class _DiaryApi implements DiaryApi {
     required String date,
     required String content,
     required List<String> hashTags,
-    required List<String> updatedImages,
-    required List<String> updatedRecord,
-    required List<File> images,
-    File? recordFile,
+    required List<String> oldImages,
+    required List<String> oldRecord,
+    required List<File> newImages,
+    required List<File> newRecord,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = FormData();
     _data.fields.add(MapEntry(
@@ -134,27 +133,24 @@ class _DiaryApi implements DiaryApi {
     hashTags.forEach((i) {
       _data.fields.add(MapEntry('tags', i));
     });
-    updatedImages.forEach((i) {
+    oldImages.forEach((i) {
       _data.fields.add(MapEntry('images', i));
     });
-    updatedRecord.forEach((i) {
+    oldRecord.forEach((i) {
       _data.fields.add(MapEntry('records', i));
     });
-    _data.files.addAll(images.map((i) => MapEntry(
+    _data.files.addAll(newImages.map((i) => MapEntry(
         'image_files',
         MultipartFile.fromFileSync(
           i.path,
           filename: i.path.split(Platform.pathSeparator).last,
         ))));
-    if (recordFile != null) {
-      _data.files.add(MapEntry(
+    _data.files.addAll(newRecord.map((i) => MapEntry(
         'record_file',
         MultipartFile.fromFileSync(
-          recordFile.path,
-          filename: recordFile.path.split(Platform.pathSeparator).last,
-        ),
-      ));
-    }
+          i.path,
+          filename: i.path.split(Platform.pathSeparator).last,
+        ))));
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<DiaryWriteResponse>(Options(
       method: 'POST',

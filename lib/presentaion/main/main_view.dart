@@ -7,6 +7,7 @@ import 'package:nabi_app/presentaion/diary/diary_write_view.dart';
 import 'package:nabi_app/presentaion/goal/goal_write_view.dart';
 import 'package:nabi_app/presentaion/main/components/floating_menu_overlay_mixin.dart';
 import 'package:nabi_app/presentaion/main/components/main_view_components.dart';
+import 'package:nabi_app/presentaion/my/my_view.dart';
 import 'package:nabi_app/user/auth_provider.dart';
 import 'package:nabi_app/utils/permission_request.dart';
 import 'package:nabi_app/utils/ui/assets.gen.dart';
@@ -89,18 +90,21 @@ class _MainViewState extends State<MainView> with FloatingMenuOverlayMixin {
   Widget _buildProfile(BuildContext context) {
     final imageUrl = context.read<AuthProvider>().userInfo!.profileImage;
 
-    return Container(
-      height: 44.w,
-      width: 44.w,
-      decoration: BoxDecoration(
-        color: Colors.pink,
-        shape: BoxShape.circle,
-        image: imageUrl?.isEmpty ?? true
-            ? null
-            : DecorationImage(
-                image: NetworkImage(imageUrl!),
-                fit: BoxFit.cover,
-              ),
+    return GestureDetector(
+      onTap: () => context.pushNamed(MyView.name),
+      child: Container(
+        height: 44.w,
+        width: 44.w,
+        decoration: BoxDecoration(
+          color: Colors.pink,
+          shape: BoxShape.circle,
+          image: imageUrl?.isEmpty ?? true
+              ? null
+              : DecorationImage(
+                  image: NetworkImage(imageUrl!),
+                  fit: BoxFit.cover,
+                ),
+        ),
       ),
     );
   }
