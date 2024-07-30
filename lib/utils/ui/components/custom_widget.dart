@@ -273,12 +273,16 @@ class CompleteButton extends StatelessWidget {
   final VoidCallback? onTap;
   final String text;
   final EdgeInsetsGeometry? margin;
-
+  final double? height;
+  final Color? activeBackgroundColor;
+  
   const CompleteButton({
     super.key,
     this.onTap,
     this.text = "설정완료",
     this.margin,
+    this.height,
+    this.activeBackgroundColor,
   });
 
   bool get active => onTap != null;
@@ -289,9 +293,9 @@ class CompleteButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        height: 48.w,
+        height: height ?? 48.w,
         decoration: BoxDecoration(
-          color: active ? color233067 : colorC6C8CF,
+          color: active ? (activeBackgroundColor ?? color233067) : colorC6C8CF,
           borderRadius: BorderRadius.circular(100),
         ),
         margin: margin ?? EdgeInsets.symmetric(horizontal: 30.w),
@@ -472,3 +476,18 @@ class OutlinedInfoContainer extends StatelessWidget {
     );
   }
 }
+
+AppBar leftTitleAppBar(String title) => AppBar(
+  centerTitle: false,
+  leadingWidth: 68.w,
+  titleSpacing: 0,
+  title: Text(
+    title,
+    style: TextStyle(
+      fontWeight: FontWeight.w700,
+      fontSize: 16.sp,
+      height: 1,
+      leadingDistribution: TextLeadingDistribution.even,
+    ),
+  ),
+);

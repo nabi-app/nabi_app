@@ -58,12 +58,19 @@ class $AssetsSvgGen {
   /// File path: assets/svg/icon_close.svg
   SvgGenImage get iconClose => const SvgGenImage('assets/svg/icon_close.svg');
 
+  /// File path: assets/svg/icon_customer_center.svg
+  SvgGenImage get iconCustomerCenter =>
+      const SvgGenImage('assets/svg/icon_customer_center.svg');
+
   /// File path: assets/svg/icon_filter.svg
   SvgGenImage get iconFilter => const SvgGenImage('assets/svg/icon_filter.svg');
 
   /// File path: assets/svg/icon_kakao_login.svg
   SvgGenImage get iconKakaoLogin =>
       const SvgGenImage('assets/svg/icon_kakao_login.svg');
+
+  /// File path: assets/svg/icon_logout.svg
+  SvgGenImage get iconLogout => const SvgGenImage('assets/svg/icon_logout.svg');
 
   /// File path: assets/svg/icon_mic.svg
   SvgGenImage get iconMic => const SvgGenImage('assets/svg/icon_mic.svg');
@@ -75,8 +82,15 @@ class $AssetsSvgGen {
   SvgGenImage get iconNabiFilled =>
       const SvgGenImage('assets/svg/icon_nabi_filled.svg');
 
+  /// File path: assets/svg/icon_notice.svg
+  SvgGenImage get iconNotice => const SvgGenImage('assets/svg/icon_notice.svg');
+
   /// File path: assets/svg/icon_play.svg
   SvgGenImage get iconPlay => const SvgGenImage('assets/svg/icon_play.svg');
+
+  /// File path: assets/svg/icon_privacy_policy.svg
+  SvgGenImage get iconPrivacyPolicy =>
+      const SvgGenImage('assets/svg/icon_privacy_policy.svg');
 
   /// File path: assets/svg/icon_profile.svg
   SvgGenImage get iconProfile =>
@@ -98,6 +112,14 @@ class $AssetsSvgGen {
   /// File path: assets/svg/icon_tag.svg
   SvgGenImage get iconTag => const SvgGenImage('assets/svg/icon_tag.svg');
 
+  /// File path: assets/svg/icon_usage_term.svg
+  SvgGenImage get iconUsageTerm =>
+      const SvgGenImage('assets/svg/icon_usage_term.svg');
+
+  /// File path: assets/svg/icon_withdraw.svg
+  SvgGenImage get iconWithdraw =>
+      const SvgGenImage('assets/svg/icon_withdraw.svg');
+
   /// List of all assets
   List<SvgGenImage> get values => [
         iconAdd,
@@ -112,18 +134,24 @@ class $AssetsSvgGen {
         iconCircleEmpty,
         iconClock,
         iconClose,
+        iconCustomerCenter,
         iconFilter,
         iconKakaoLogin,
+        iconLogout,
         iconMic,
         iconNabi,
         iconNabiFilled,
+        iconNotice,
         iconPlay,
+        iconPrivacyPolicy,
         iconProfile,
         iconRadio,
         iconReset,
         iconShuffle,
         iconSort,
-        iconTag
+        iconTag,
+        iconUsageTerm,
+        iconWithdraw
       ];
 }
 

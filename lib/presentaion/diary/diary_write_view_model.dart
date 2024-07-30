@@ -36,13 +36,17 @@ class DiaryWriteViewModel extends ChangeNotifier {
 
   File? get recordFile => _recordFile;
 
-  String? _updatedRecord;
+  String? _oldRecord;
+
+  File? _newRecord;
 
   List<File> _images = [];
 
   List<File> get images => _images;
 
-  final List<String> _updatedImages = [];
+  List<String> _oldImages = [];
+
+  final List<File> _newImages = [];
 
   String _content = "";
 
@@ -57,9 +61,13 @@ class DiaryWriteViewModel extends ChangeNotifier {
   }
 
   Future _init(DiaryItemData? data) async {
+    if (data == null) return;
+
     _diaryItemData = data;
 
-    if (data == null) return;
+    _oldRecord = data.record;
+
+    _oldImages = List.from(data.images ?? []);
 
     onViewTypeChanged(DiaryWriteViewType.readOnly);
 
@@ -145,13 +153,19 @@ class DiaryWriteViewModel extends ChangeNotifier {
   void onRecordFileChanged(File? file) {
     if (file == null) return;
 
+    if (_viewType == DiaryWriteViewType.edit) {
+      _newRecord = file;
+      _oldRecord = null;
+    }
+
     _recordFile = file;
     notifyListeners();
   }
 
   void deleteRecordFile() {
-    if (_viewType == DiaryWriteViewType.edit && _diaryItemData!.record != null) {
-      _updatedRecord = _diaryItemData!.record;
+    if (_viewType == DiaryWriteViewType.edit) {
+      _newRecord = null;
+      _oldRecord = null;
     }
 
     _recordFile = null;
@@ -161,20 +175,27 @@ class DiaryWriteViewModel extends ChangeNotifier {
   void addImage(XFile? image) {
     if (image == null) return;
 
+    final file = File(image.path);
+
+    if (_viewType == DiaryWriteViewType.edit) _newImages.add(file);
+
     _images = [
       ..._images,
       File(image.path),
     ];
+
     notifyListeners();
   }
 
   void removeImage(int index) {
-    if (_viewType == DiaryWriteViewType.edit && (_diaryItemData!.images?.isNotEmpty ?? false)) {
-      final deleteImagePath = _diaryItemData!.images!.firstWhereOrNull(
-        (path) => path.hashCode == _images[index].path.split('/').last.hashCode,
-      );
+    if (_viewType == DiaryWriteViewType.edit) {
+      final targetOldImage = _oldImages.firstWhereIndexedOrNull((i, _) => i == index);
 
-      if (deleteImagePath != null) _updatedImages.add(deleteImagePath);
+      if (targetOldImage != null) _oldImages.remove(targetOldImage);
+
+      final targetNewImage = _newImages.firstWhereOrNull((image) => image.path == _images[index].path);
+
+      if (targetNewImage != null) _newImages.remove(targetNewImage);
     }
 
     _images = [
@@ -219,13 +240,13 @@ class DiaryWriteViewModel extends ChangeNotifier {
 
       final response = await _repository.updateDiary(
         diaryId: _diaryItemData!.diaryId,
-        date: date,
-        content: content,
-        hashTags: hashTags,
-        updatedImages: _updatedImages,
-        updatedRecord: _updatedRecord,
-        images: images,
-        recordFile: recordFile,
+        date: _date,
+        content: _content,
+        hashTags: _hashTags,
+        oldImages: _oldImages,
+        oldRecord: _oldRecord,
+        newImages: _newImages,
+        newRecord: _newRecord,
       );
 
       _diaryItemData = response.data;

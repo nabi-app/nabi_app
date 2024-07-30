@@ -42,19 +42,20 @@ class DiaryRepositoryImpl implements DiaryRepository {
     required DateTime date,
     required String content,
     required List<String> hashTags,
-    required List<String> updatedImages,
-    required String? updatedRecord,
-    required List<File> images,
-    required File? recordFile,
+    required List<String> oldImages,
+    required String? oldRecord,
+    required List<File> newImages,
+    required File? newRecord,
   }) {
     return _api.updateDiary(
       diaryId: diaryId,
       date: DateFormat("yyyy-MM-dd").format(date),
       content: content,
       hashTags: hashTags,
-      updatedImages: updatedImages,
-      updatedRecord: [if (updatedRecord != null) updatedRecord],
-      images: images,
+      oldImages: oldImages,
+      oldRecord: [if (oldRecord != null) oldRecord],
+      newImages: newImages,
+      newRecord: [if (newRecord != null) newRecord],
     );
   }
 

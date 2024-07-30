@@ -20,6 +20,15 @@ import 'package:nabi_app/presentaion/diary/diary_page.dart';
 import 'package:nabi_app/presentaion/main/main_view.dart';
 import 'package:nabi_app/presentaion/music_recommend/music_recommend_page.dart';
 import 'package:nabi_app/presentaion/music_recommend/music_recommend_page_view_model.dart';
+import 'package:nabi_app/presentaion/my/my_view.dart';
+import 'package:nabi_app/presentaion/my/my_view_model.dart';
+import 'package:nabi_app/presentaion/my/notice_detail_view.dart';
+import 'package:nabi_app/presentaion/my/notice_view.dart';
+import 'package:nabi_app/presentaion/my/notice_view_model.dart';
+import 'package:nabi_app/presentaion/my/privacy_policy_view.dart';
+import 'package:nabi_app/presentaion/my/usage_term_view.dart';
+import 'package:nabi_app/presentaion/my/withdraw_view.dart';
+import 'package:nabi_app/presentaion/my/withdraw_view_model.dart';
 import 'package:nabi_app/presentaion/nabi_collection/nabi_collection_page.dart';
 import 'package:nabi_app/presentaion/nabi_collection/nabi_collection_page_view_model.dart';
 import 'package:nabi_app/presentaion/sign_up/sign_up_complete_view.dart';
@@ -124,6 +133,47 @@ final GoRouter routerConfig = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: MyView.path,
+      name: MyView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<MyViewModel>(),
+        builder: (_, __) => const MyView(),
+      ),
+    ),
+    GoRoute(
+      path: UsageTermView.path,
+      name: UsageTermView.name,
+      builder: (_, __) => const UsageTermView(),
+    ),
+    GoRoute(
+      path: PrivacyPolicyView.path,
+      name: PrivacyPolicyView.name,
+      builder: (_, __) => const PrivacyPolicyView(),
+    ),
+    GoRoute(
+      path: WithdrawView.path,
+      name: WithdrawView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<WithdrawViewModel>(),
+        builder: (_, __) => const WithdrawView(),
+      ),
+    ),
+    GoRoute(
+      path: NoticeView.path,
+      name: NoticeView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<NoticeViewModel>(),
+        builder: (_, __) => const NoticeView(),
+      ),
+      routes: [
+        GoRoute(
+          path: NoticeDetailView.path,
+          name: NoticeDetailView.name,
+          builder: (_, __) => const NoticeDetailView(),
+        ),
+      ]
     ),
     GoRoute(
       path: GoalWriteView.path,

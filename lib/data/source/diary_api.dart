@@ -33,10 +33,10 @@ abstract class DiaryApi {
     @Part() required String date,
     @Part(name: "desc") required String content,
     @Part(name: "tags") required List<String> hashTags,
-    @Part(name: "images") required List<String> updatedImages,
-    @Part(name: "records") required List<String> updatedRecord,
-    @Part(name: "image_files") required List<File> images,
-    @Part(name: "record_file") File? recordFile,
+    @Part(name: "images") required List<String> oldImages,
+    @Part(name: "records") required List<String> oldRecord,
+    @Part(name: "image_files") required List<File> newImages,
+    @Part(name: "record_file") required List<File> newRecord,
   });
 
   @DELETE("/diary/{id}")

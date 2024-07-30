@@ -20,10 +20,10 @@ abstract interface class DiaryRepository {
     required DateTime date,
     required String content,
     required List<String> hashTags,
-    required List<String> updatedImages,
-    required String? updatedRecord,
-    required List<File> images,
-    required File? recordFile,
+    required List<String> oldImages,
+    required String? oldRecord,
+    required List<File> newImages,
+    required File? newRecord,
   });
 
   Future<void> deleteDiary({required int diaryId});
