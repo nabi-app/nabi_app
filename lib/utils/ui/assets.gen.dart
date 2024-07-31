@@ -25,6 +25,10 @@ class $AssetsSvgGen {
   SvgGenImage get iconAppleLogin =>
       const SvgGenImage('assets/svg/icon_apple_login.svg');
 
+  /// File path: assets/svg/icon_arrow_bottom.svg
+  SvgGenImage get iconArrowBottom =>
+      const SvgGenImage('assets/svg/icon_arrow_bottom.svg');
+
   /// File path: assets/svg/icon_arrow_left.svg
   SvgGenImage get iconArrowLeft =>
       const SvgGenImage('assets/svg/icon_arrow_left.svg');
@@ -109,6 +113,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/icon_sort.svg
   SvgGenImage get iconSort => const SvgGenImage('assets/svg/icon_sort.svg');
 
+  /// File path: assets/svg/icon_sound.svg
+  SvgGenImage get iconSound => const SvgGenImage('assets/svg/icon_sound.svg');
+
   /// File path: assets/svg/icon_tag.svg
   SvgGenImage get iconTag => const SvgGenImage('assets/svg/icon_tag.svg');
 
@@ -125,6 +132,7 @@ class $AssetsSvgGen {
         iconAdd,
         iconAlbum,
         iconAppleLogin,
+        iconArrowBottom,
         iconArrowLeft,
         iconArrowRight,
         iconCalendar,
@@ -149,6 +157,7 @@ class $AssetsSvgGen {
         iconReset,
         iconShuffle,
         iconSort,
+        iconSound,
         iconTag,
         iconUsageTerm,
         iconWithdraw
