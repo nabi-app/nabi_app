@@ -18,6 +18,7 @@ import 'package:nabi_app/presentaion/login/login_view.dart';
 import 'package:nabi_app/presentaion/login/login_view_model.dart';
 import 'package:nabi_app/presentaion/diary/diary_page.dart';
 import 'package:nabi_app/presentaion/main/main_view.dart';
+import 'package:nabi_app/presentaion/music_recommend/music_recommend_detail_view.dart';
 import 'package:nabi_app/presentaion/music_recommend/music_recommend_page.dart';
 import 'package:nabi_app/presentaion/music_recommend/music_recommend_page_view_model.dart';
 import 'package:nabi_app/presentaion/my/my_view.dart';
@@ -135,47 +136,6 @@ final GoRouter routerConfig = GoRouter(
       ],
     ),
     GoRoute(
-      path: MyView.path,
-      name: MyView.name,
-      builder: (_, __) => ChangeNotifierProvider(
-        create: (_) => getIt<MyViewModel>(),
-        builder: (_, __) => const MyView(),
-      ),
-    ),
-    GoRoute(
-      path: UsageTermView.path,
-      name: UsageTermView.name,
-      builder: (_, __) => const UsageTermView(),
-    ),
-    GoRoute(
-      path: PrivacyPolicyView.path,
-      name: PrivacyPolicyView.name,
-      builder: (_, __) => const PrivacyPolicyView(),
-    ),
-    GoRoute(
-      path: WithdrawView.path,
-      name: WithdrawView.name,
-      builder: (_, __) => ChangeNotifierProvider(
-        create: (_) => getIt<WithdrawViewModel>(),
-        builder: (_, __) => const WithdrawView(),
-      ),
-    ),
-    GoRoute(
-      path: NoticeView.path,
-      name: NoticeView.name,
-      builder: (_, __) => ChangeNotifierProvider(
-        create: (_) => getIt<NoticeViewModel>(),
-        builder: (_, __) => const NoticeView(),
-      ),
-      routes: [
-        GoRoute(
-          path: NoticeDetailView.path,
-          name: NoticeDetailView.name,
-          builder: (_, __) => const NoticeDetailView(),
-        ),
-      ]
-    ),
-    GoRoute(
       path: GoalWriteView.path,
       name: GoalWriteView.name,
       builder: (_, __) => ChangeNotifierProvider(
@@ -206,6 +166,51 @@ final GoRouter routerConfig = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: MusicRecommendDetailView.path,
+      name: MusicRecommendDetailView.name,
+      builder: (_, __) => MusicRecommendDetailView(),
+    ),
+    GoRoute(
+      path: MyView.path,
+      name: MyView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<MyViewModel>(),
+        builder: (_, __) => const MyView(),
+      ),
+    ),
+    GoRoute(
+      path: UsageTermView.path,
+      name: UsageTermView.name,
+      builder: (_, __) => const UsageTermView(),
+    ),
+    GoRoute(
+      path: PrivacyPolicyView.path,
+      name: PrivacyPolicyView.name,
+      builder: (_, __) => const PrivacyPolicyView(),
+    ),
+    GoRoute(
+      path: WithdrawView.path,
+      name: WithdrawView.name,
+      builder: (_, __) => ChangeNotifierProvider(
+        create: (_) => getIt<WithdrawViewModel>(),
+        builder: (_, __) => const WithdrawView(),
+      ),
+    ),
+    GoRoute(
+        path: NoticeView.path,
+        name: NoticeView.name,
+        builder: (_, __) => ChangeNotifierProvider(
+              create: (_) => getIt<NoticeViewModel>(),
+              builder: (_, __) => const NoticeView(),
+            ),
+        routes: [
+          GoRoute(
+            path: NoticeDetailView.path,
+            name: NoticeDetailView.name,
+            builder: (_, __) => const NoticeDetailView(),
+          ),
+        ]),
   ],
   refreshListenable: getIt<AuthProvider>(),
   redirect: getIt<AuthProvider>().redirection,

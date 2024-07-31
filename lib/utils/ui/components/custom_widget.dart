@@ -477,6 +477,55 @@ class OutlinedInfoContainer extends StatelessWidget {
   }
 }
 
+class FilterButton extends StatelessWidget {
+  final Widget? icon;
+  final String? text;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  const FilterButton({
+    super.key,
+    this.icon,
+    this.text,
+    this.selected = true,
+    this.onTap,
+  }) : assert(icon == null || text == null, "icon 또는 text 둘중 하나는 제공되어야 합니다.");
+
+  Color get primaryColor => selected ? color233067 : color999DAC;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 32.w,
+        padding: EdgeInsets.symmetric(horizontal: 13.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(color: primaryColor),
+          color: colorDBDDE5,
+        ),
+        child: icon ??
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.w),
+              child: Text(
+                text!,
+                style: TextStyle(
+                  color: primaryColor,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14.sp,
+                  height: 1,
+                  leadingDistribution: TextLeadingDistribution.even,
+                  letterSpacing: -0.48,
+                ),
+              ),
+            ),
+      ),
+    );
+  }
+}
+
+
 AppBar leftTitleAppBar(String title) => AppBar(
   centerTitle: false,
   leadingWidth: 68.w,

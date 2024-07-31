@@ -61,44 +61,49 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 
   Widget _buildFilterButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.w),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 8.w,
-        runSpacing: 8.w,
+    return Container(
+      height: 32.w,
+      margin: EdgeInsets.symmetric(vertical: 6.w),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         children: [
-          DiaryFilterButton(
+          FilterButton(
             icon: Assets.svg.iconFilter.svg(width: 20.w, height: 20.w),
             onTap: () => _onFilterTap(context),
           ),
+          SizedBox(width: 8.w),
           Selector<DiaryPageViewModel, bool>(
             selector: (_, viewModel) => viewModel.isTagFilterSelected,
-            builder: (_, isTagFilterSelected, __) => DiaryFilterButton(
+            builder: (_, isTagFilterSelected, __) => FilterButton(
               text: "태그",
               selected: isTagFilterSelected,
               onTap: () => _onFilterTap(context),
             ),
           ),
+          SizedBox(width: 8.w),
           Selector<DiaryPageViewModel, bool>(
             selector: (_, viewModel) => viewModel.isImageFilterSelected,
-            builder: (_, isImageFilterSelected, __) => DiaryFilterButton(
+            builder: (_, isImageFilterSelected, __) => FilterButton(
               text: "이미지",
               selected: isImageFilterSelected,
               onTap: () => _onFilterTap(context),
             ),
           ),
+          SizedBox(width: 8.w),
           Selector<DiaryPageViewModel, bool>(
             selector: (_, viewModel) => viewModel.isRecordFilterSelected,
-            builder: (_, isRecordFilterSelected, __) => DiaryFilterButton(
+            builder: (_, isRecordFilterSelected, __) => FilterButton(
               text: "녹음",
               selected: isRecordFilterSelected,
               onTap: () => _onFilterTap(context),
             ),
           ),
+          SizedBox(width: 8.w),
           Selector<DiaryPageViewModel, int?>(
             selector: (_, viewModel) => viewModel.filterMonth,
-            builder: (_, filterMonth, __) => DiaryFilterButton(
+            builder: (_, filterMonth, __) => FilterButton(
               text: "월별",
               selected: filterMonth != null,
               onTap: () => _onFilterTap(context),
